@@ -4,13 +4,15 @@ from utils import (
     functions
 )
 import os
-from retriever import Retriever
+from retriever import GradingRetriever
 from config import Config
 from assignment import Assignment
+from human import Human
+import json
 
 app = Flask(__name__)
 app.config.from_object(Config)
-retriever = Retriever()
+retriever = GradingRetriever()
 
 @app.route('/add-web-content', methods=['POST'])
 def add_web_content():
@@ -59,7 +61,22 @@ def retrieve_content():
     # TODO
     return jsonify({"content": 'content'}), 200
 
-
+@app.route('/create_account', methods=['POST'])
+def create_account():
+    """Endpoint to create an account for a human"""
+    # add converter and then we need llm agent to parse the file to get it in the format we want
+    data = request.json
+    email = data["email"]
+    password = data["password"]
+    with open("accounts.json", "r") as file:
+        data = json.load(file)
+        if email in data:
+            return -1
+        id = data["id"]
+        data[email] = [password, id]
+        return 1
+    
+    #TODO
 
 
 if __name__ == '__main__':

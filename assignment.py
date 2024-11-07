@@ -53,7 +53,7 @@ class Assignment:
     
     def grade(self):
         # combine_rubric_and_answers will return dictionary of the student id and value being the rubric items with answers
-        rubric_items = self.combine_rubric_and_answers(self.questions, self.student_answers)
+        rubric_items = self.combine_rubric_and_answers(self.rubric, self.student_answers)
         graph = self.create_graph(self.workflow)
         for student_id in self.student_answers.keys:
             student_rubric_items = rubric_items[student_id]
