@@ -29,17 +29,20 @@ from langchain_core.messages import AIMessage
 from langchain_core.output_parsers import JsonOutputParser
 from llm_agent import AgentState
 from llm_agent import LLMAgent
+import json
 
 class Grader:
     def __init__(self, llm):
         self.agent = self.create_agent(llm)
+        self.file = "prompts.json"
     
     def create_agent(self, llm):
-        system_message= "You should grade the student answers based on the rubric to the best of your ability. " 
-        "Do not go against the rubric information and assume anything on your own. Do not assume typos, go with what is given to you. "
-        "Treat each rubric item as a condition, and negative points should be rewarded if the condition is satisfied. "
-        "Do not take semantics of the rubric into account. Rubric is the truth. Scores can only be 0 or the points shown in the rubric item."
-
+        # system_message= "You should grade the student answers based on the rubric to the best of your ability. " 
+        # "Do not go against the rubric information and assume anything on your own. Do not assume typos, go with what is given to you. "
+        # "Treat each rubric item as a condition, and negative points should be rewarded if the condition is satisfied. "
+        # "Do not take semantics of the rubric into account. Rubric is the truth. Scores can only be 0 or the points shown in the rubric item."
+        
+        system_message = "".join(json.load(self.file)["grader_system_message"])
         prompt = ChatPromptTemplate.from_messages(
             [
                 (

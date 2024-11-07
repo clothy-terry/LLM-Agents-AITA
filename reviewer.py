@@ -29,22 +29,26 @@ from langchain_core.messages import AIMessage
 from langchain_core.output_parsers import JsonOutputParser
 from llm_agent import AgentState
 from llm_agent import LLMAgent
+import json
 
 class Reviewer:
     def __init__(self, llm):
         self.agent = self.create_agent(llm)
+        self.file = "prompts.json"
     
     def create_agent(self, llm):
-        system_message="Your role is to review the points and reasoning given by the grader, and ensure that all information is correct and factual. "
-        "The information in the reasoning should primarily be built from the rubric, and the grader's score and reasoning respectively. " 
-        "\n --- \n The rubric items are formatted in the form 'Question #, question, rubric, answer, grade'. "
-        "You will be given this item, and also context related to the rubric item from the database we have. \n --- \n "
-        "Read the reasoning carefully to make sure no hallucination and distraction is there. "
-        "If you think there is a mistake in the grading regarding the points given, object. Think step by step and review the grading and reasoning for the rubric item in the messages, "
-        "and make your review concise. If there is no mistake in the grade of a rubric item, start your review with 'FINAL POINTS:', otherwise start with 'WRONG POINTS:', and you must start with either. "
-        "The conversation state will contains the grades in the format 'score, reasoning', so if the score is correct, do not output 'WRONG POINTS:'. If you think the grader gave the correct points, "
-        "just make sure mentions what the rubric expected. The beginning of the review is only two options: 'FINAL POINTS:' if the grade gave the correct points, and 'WRONG POINTS:' "
-        "if the grade did not give the correct points"
+        # system_message="Your role is to review the points and reasoning given by the grader, and ensure that all information is correct and factual. "
+        # "The information in the reasoning should primarily be built from the rubric, and the grader's score and reasoning respectively. " 
+        # "\n --- \n The rubric items are formatted in the form 'Question #, question, rubric, answer, grade'. "
+        # "You will be given this item, and also context related to the rubric item from the database we have. \n --- \n "
+        # "Read the reasoning carefully to make sure no hallucination and distraction is there. "
+        # "If you think there is a mistake in the grading regarding the points given, object. Think step by step and review the grading and reasoning for the rubric item in the messages, "
+        # "and make your review concise. If there is no mistake in the grade of a rubric item, start your review with 'FINAL POINTS:', otherwise start with 'WRONG POINTS:', and you must start with either. "
+        # "The conversation state will contains the grades in the format 'score, reasoning', so if the score is correct, do not output 'WRONG POINTS:'. If you think the grader gave the correct points, "
+        # "just make sure mentions what the rubric expected. The beginning of the review is only two options: 'FINAL POINTS:' if the grade gave the correct points, and 'WRONG POINTS:' "
+        # "if the grade did not give the correct points"
+
+        system_message = "".join(json.load(self.file)["reviewer_system_message"])
 
         prompt = ChatPromptTemplate.from_messages(
             [

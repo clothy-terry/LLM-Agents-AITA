@@ -39,7 +39,7 @@ class GradingRetriever:
             self.splits.extend(doc_splits)
             faiss_index = FAISS.from_documents(self.splits, embedding=OpenAIEmbeddings())
             faiss_retriever = faiss_index.as_retriever()
-
+ 
 
             bm25_retriever = BM25Retriever.from_documents(self.splits)
 

@@ -26,21 +26,22 @@ from langchain_core.messages import AIMessage
 from langchain_core.output_parsers import JsonOutputParser
 from llm_agent import AgentState
 from llm_agent import LLMAgent
+import json
 
 class AIDetector:
     def __init__(self, llm):
         self.agent = self.create_agent(llm)
     
     def create_agent(self, llm):
-        system_message="You are assuming the role of an AI-content detector. The messages in the conversation state will contain the question and student answer in the format "
-        "'question:answer', and you need to determine whether the answer contains AI-generated content. Provide the score as a JSON with exactly two keys: 'score' and 'lines'. "
-        "The score should be a value between 0.0 and 100.0, where the higher the score is, the higher the percentage of AI-generated content exists in the student answer. "
-        "The value for the 'lines' key should only cite the parts of the student answer where you can guarantee there is AI-content in the student answer, so it only contain content "
-        "EXACTLY in the student answer and nothing else, I REPEAT nothing else. Make sure the content is all regarding what is written by the student. The lines output should be only "
-        "taken from the student answer. Do not write anything other than that. If the answer is empty, output 0.1, and if there is no miniscule relation between the answer and question,"
-        "output 0.0. There should be no preamble or explanation."
+        # system_message="You are assuming the role of an AI-content detector. The messages in the conversation state will contain the question and student answer in the format "
+        # "'question:answer', and you need to determine whether the answer contains AI-generated content. Provide the score as a JSON with exactly two keys: 'score' and 'lines'. "
+        # "The score should be a value between 0.0 and 100.0, where the higher the score is, the higher the percentage of AI-generated content exists in the student answer. "
+        # "The value for the 'lines' key should only cite the parts of the student answer where you can guarantee there is AI-content in the student answer, so it only contain content "
+        # "EXACTLY in the student answer and nothing else, I REPEAT nothing else. Make sure the content is all regarding what is written by the student. The lines output should be only "
+        # "taken from the student answer. Do not write anything other than that. If the answer is empty, output 0.1, and if there is no miniscule relation between the answer and question,"
+        # "output 0.0. There should be no preamble or explanation."
 
-
+        system_message = "".join(json.load(self.file)["detector_system_message"])
         prompt = ChatPromptTemplate.from_messages(
             [
                 (

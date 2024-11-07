@@ -99,7 +99,7 @@ class LLMAgent:
         messages = state["messages"]
         q_a_pairs = ""
         answers = []
-        prev_q = questions[0]
+        prev_q = None
         for i, question in enumerate(questions):
             # if answers:
                 # q_a_pair = format_qa_pair(prev_q,answers[-1])
