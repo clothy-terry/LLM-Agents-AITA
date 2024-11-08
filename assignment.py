@@ -31,14 +31,16 @@ from llm_agent import AgentState
 from llm_agent import LLMAgent
 
 class Assignment:
-    def __init__(self, app: Flask, rubric: List[str], grading_retriever):
+    def __init__(self, app: Flask, questions, rubric: List[str], grading_retriever):
         # Initialize Flask app and configure it
         # self.app = app
         # self.app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
         # self.app.config['MAX_CONTENT_LENGTH'] = Config.MAX_CONTENT_LENGTH
         self.app = app
         self.model_name = Config.MODEL_NAME
-        self.rubric = rubric
+        # self.questions = questions
+        # self.rubric = rubric
+        self.questions_and_rubric = self.combine_rubric_and_questions(questions, rubric)
         # assuming answers will be in format, but need to use llm agent to parse them into the correct format (may not need agent)
         self.student_answers = dict()
         self.student_grades = defaultdict(int)
@@ -53,7 +55,7 @@ class Assignment:
     
     def grade(self):
         # combine_rubric_and_answers will return dictionary of the student id and value being the rubric items with answers
-        rubric_items = self.combine_rubric_and_answers(self.rubric, self.student_answers)
+        rubric_items = self.combine_rubric_and_answers(self.questions_and_rubric, self.student_answers)
         graph = self.create_graph(self.workflow)
         for student_id in self.student_answers.keys:
             student_rubric_items = rubric_items[student_id]

@@ -29,17 +29,14 @@ from langchain_core.messages import AIMessage
 from langchain_core.output_parsers import JsonOutputParser
 from llm_agent import AgentState
 from llm_agent import LLMAgent
-from retriever import GradingRetriever
 
-class Course:
+class Global:
     def __init__(self, app: Flask):
         # Initialize Flask app and configure it
         # self.app = app
         # self.app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
         # self.app.config['MAX_CONTENT_LENGTH'] = Config.MAX_CONTENT_LENGTH
         self.app = app
-        self.students = set()
-        self.teachers = set()
-        self.assignments = dict()
-        self.retriever = GradingRetriever()
-    
+        #not scalable, but fine for now
+        self.humans = dict()
+        self.courses = dict()
