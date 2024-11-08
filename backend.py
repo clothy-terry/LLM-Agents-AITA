@@ -35,7 +35,7 @@ def add_web_content():
     else:
         return jsonify({"error": result}), 500
     
-# Routes for handling input PDFs and grading
+# Routes for handling input assignments PDFs
 @app.route('/upload', methods=['POST'])
 def upload_assignment_pdf():
     """Endpoint to upload and convert PDF assignments to LaTeX"""
@@ -51,6 +51,14 @@ def upload_assignment_pdf():
     main_access.courses[course_id].add_assignment(assignment)
     return jsonify({"success": '1'}), 200 
     #TODO
+# Routes for indexing course material
+@app.route('/index-course-material', methods=['POST'])
+def index_course_material():
+    """Endpoint to index course material (PDF/Docx)."""
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part in the request."}), 400
+    file = request.files['file']
+    # TODO
 
 # Route for AI-generated content detection
 @app.route('/detect-ai-content', methods=['POST'])
@@ -60,21 +68,17 @@ def detect_ai_content():
     # TODO
     return jsonify({"detection_results": 'detection_results'}), 200
 
-# Route for grading assignments with multi-layer verification
+# Route for grading and commenting assignments with multi-layer verification
 @app.route('/grade-assignment', methods=['POST'])
 def grade_assignment_route():
-    """Grade an assignment PDF using LLM and multi-layer agents for accuracy and hallucination reduction"""
+    """Grade and commentan assignment PDF"""
     course_id = request.json.get('course_id')
     assignment_id = request.json.get('assignment_id') 
-    return jsonify({"grade": 'grade'}), 200
-    
-
-# Route for retrieving relevant course content for RAG purposes
-@app.route('/retrieve-course-content', methods=['POST'])
-def retrieve_content():
-    """Retrieve and provide relevant course content to guide the LLM for grading"""
-    # TODO
-    return jsonify({"content": 'content'}), 200
+    # Example of returned structure:
+    return jsonify({"grade_and_comment": [
+        {'question': 'Q1', 'student_answer': '...', 'grade': 'A', 'feedback': 'Great job!'},
+        {'question': 'Q2', 'student_answer': '...', 'grade': 'B', 'feedback': 'Needs improvement.'},
+    ]}), 200
 
 @app.route('/create_account', methods=['POST'])
 def create_account():
