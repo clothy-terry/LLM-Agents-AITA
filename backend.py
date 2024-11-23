@@ -41,12 +41,16 @@ from typing_extensions import TypedDict
 
 from langchain_openai import ChatOpenAI
 
+from langchain_community.document_loaders import PyPDFLoader
+
 app = Flask(__name__)
 app.config.from_object(Config)
 documents = []
 splits = []
 ensemble_retriever = None 
 questions = None
+ALLOWED_EXTENSIONS = {'pdf'}
+questions_and_rubric = []
 
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], operator.add]
@@ -55,8 +59,11 @@ class AgentState(TypedDict):
 @app.route('/add-web-content', methods=['POST'])
 def add_web_content():
     """Add new web content to the Retriever and update splits."""
+    global documents, splits, ensemble_retriever
     data = request.json
     web_paths = data.get('web_paths')  # Extract 'web_paths' from JSON
+    if not web_paths or not isinstance(web_paths, list):
+        return jsonify({"error": "Invalid or missing 'web_paths'. Provide a list of URLs."}), 400
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             chunk_size=300,
             chunk_overlap=50)
@@ -75,9 +82,9 @@ def add_web_content():
         # Split documents and add splits to the splits list
         doc_splits = text_splitter.split_documents(new_docs)
         splits.extend(doc_splits)
+        result = len(doc_splits)
         faiss_index = FAISS.from_documents(splits, embedding=OpenAIEmbeddings())
         faiss_retriever = faiss_index.as_retriever()
-
 
         bm25_retriever = BM25Retriever.from_documents(splits)
 
@@ -91,18 +98,115 @@ def add_web_content():
     else:
         return jsonify({"error": result}), 500
     
+# Function to check if file has an allowed extension
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # Routes for handling input assignments PDFs
 @app.route('/upload', methods=['POST'])
 def upload_assignment_pdf():
     """Endpoint to upload and convert PDF assignments to LaTeX"""
+    global questions
     # add converter and then we need llm agent to parse the file to get it in the format we want
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed, only PDFs are allowed'}), 400
+    
+    # Save the file
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(file_path)
+    loader = PyPDFLoader(file_path)
+    pages = []
+    for page in loader.alazy_load():
+        pages.append(page)
+    combined_text = "\n".join(pages)
+    question_answer_template = """You are a helpful assistant that gets the questions from a string of questions, based on the question number and subquestion letter. The questions are formatted with the number, and then the question. I just want the question. Each question/subquestion should separated by '\n'. Here is the entire question list {question}. The output should be 'question#: question'.
+        Output (n question # - question pairs):"""
+    get_questions = ChatPromptTemplate.from_template(question_answer_template)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    generate_questions = (get_questions | llm | StrOutputParser() | (lambda x: x.split("\n")))
+
+    questions = generate_questions.invoke({"question":combined_text})
+    return jsonify({'message': 'File uploaded successfully'}), 200
+
+# Routes for handling input PDFs for RAG
+@app.route('/upload', methods=['POST'])
+def upload_pdf():
+    """Endpoint to upload and convert PDF assignments to LaTeX"""
+    # add converter and then we need llm agent to parse the file to get it in the format we want
+    global documents, splits, ensemble_retriever
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed, only PDFs are allowed'}), 400
+    
+    # Save the file
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(file_path)
+    loader = PyPDFLoader(file_path)
+    try:
+        documents = loader.load()
+        # Step 2: Split the Text
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=300,  # Number of characters per chunk
+            chunk_overlap=50  # Overlap between chunks
+        )
+        doc_splits = text_splitter.split_documents(documents)
+
+        pages = []
+        for page in loader.alazy_load():
+            pages.append(page)
+        combined_text = "\n".join(pages)
+        question_answer_template = """You are a helpful assistant that gets the questions from a string of questions, based on the question number and subquestion letter. The questions are formatted with the number, and then the question. I just want the question. Each question/subquestion should separated by '\n'. Here is the entire question list {question}. The output should be 'question#: question'.
+            Output (n question # - question pairs):"""
+        get_questions = ChatPromptTemplate.from_template(question_answer_template)
+        llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+        generate_questions = (get_questions | llm | StrOutputParser() | (lambda x: x.split("\n")))
+
+        questions = generate_questions.invoke({"question":combined_text})
+        
+        splits.extend(doc_splits)
+        result = len(doc_splits)
+        faiss_index = FAISS.from_documents(splits, embedding=OpenAIEmbeddings())
+        faiss_retriever = faiss_index.as_retriever()
+
+        bm25_retriever = BM25Retriever.from_documents(splits)
+
+        ensemble_retriever = EnsembleRetriever(retrievers=[bm25_retriever, faiss_retriever],
+                                    weights=[0.4, 0.6])
+    except Exception as e:
+        return f"Error loading documents: {str(e)}"
+
+    if isinstance(result, int):
+        return jsonify({"message": f"{result} new documents added."}), 200
+    else:
+        return jsonify({"error": result}), 500
+
+@app.route('/combine_q_r', methods=['POST'])
+def combine_q_r():
+    global questions_and_rubric
+
     data = request.json
-    questions = data.get("questions")
-    rubric = data.get("rubric")
-    # llm stuff to get the questions and rubric and combine them 
-    rubric_items = combine_rubric_and_questions(questions, rubric)
-    return rubric_items
-    #TODO
+    rubrics = data.get('rubrics')
+    questions_and_rubric = []
+    for i in range(len(questions)):
+        questions_and_rubric.append([])
+        if not questions[i]['subfields']:
+            for j in range(len(rubrics[i])):
+                questions_and_rubric[-1].append(questions[i] + " - " + rubrics[i][j])
+        else:
+            for j in range(len(questions[i]['subfields'])):
+                questions_and_rubric[-1].append([])
+                for k in range(len(rubrics[i][j])):
+                    questions_and_rubric[-1][-1].append(questions[i]['subfields'][j] + " - " + rubrics[i][j][k])
+    return jsonify({'message': 'Combined questions and rubric successfully'}), 200
 
 # # Route for AI-generated content detection
 # @app.route('/detect-ai-content', methods=['POST'])
@@ -127,21 +231,12 @@ def grade_assignment_route():
     """Grade an assignment PDF using LLM and multi-layer agents for accuracy and hallucination reduction"""
     data = request.json
     answers = data.get("answers")
-    template = """You are a helpful assistant that divides the rubric/answer key and the student answers into separate entries. Each entry includes the question number, question, rubric item on what content would reward/deduct points for the answer, and the entire answer. Do not output multiple rubric items at once. \n
-    The goal is to break down the rubric into a set of rubric items that can be checked in isolation. \n
-    Divide the rubric into separate items. For example if the question numbers are 1, 2a, 2b, 2c, 3, 4, each question will be divided and then the following rubric items and the student answer will be for the question. Ensure that the number of items for each question corresponds to the number of rubric items where points are rewarded or deducted. Do nut make up rubric items. Follow the following rubric entirely. You are grounded by this rubric, so everything comes from this rubric.  \n
-    Strictly format the division of the rubric into 'question #: question: rubric item: student answer', and if there are multiple rubric items for each question, then separate each item into separate entries, but maintain the same question number, question and answer. Therefore, each rubric item for the same question should have the same question number, question, and answer.  \n
-    Make sure the question #, question, and rubric item, and it follows the rubric entirely to a tee. The answer must be grounded as well, and use only the student answers provided to divide them. Each element in the list of rubric items should consist of an non-empty string of a rubric item, and each element should have the question #, question, rubric item and answer in one string. If the student answer is empty, simply add 'N/A' at the end of the rubric item. Make sure there is only one rubric point item per entry, and do not repeat entries. Here is the entire rubric list  {question}. Here are the student answers {answer}\n
-    Do not have empty rubric items. Do not output the entire rubric at the beginning of this decomposition. I only want sub-rubric items. Output (n rubric items):"""
-    prompt_decomposition = ChatPromptTemplate.from_template(template)
-    question_answer_template = """You are a helpful assistant that gets the questions from a string of rubric items, and then keeps the corresponding answer, based on the number, right after the question. The rubric items are formatted with the number, then the question, then the rubric points. I just want the question. Each rubric item is separated by '\n'. Here is the entire rubric list  {question}. Here are the student answers {answer}. The output should be 'question: answer'.
-    Output (n question-answer pairs):"""
-    get_questions = ChatPromptTemplate.from_template(question_answer_template)
+    qra = []
+    for i in range(len(answers)):
+        qra.append([])
+        for j in range(questions_and_rubric[i]):
+            qra[-1].append(questions_and_rubric[i][j] + " :  " + answers[i])
     llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
-    generate_queries_decomposition = ( prompt_decomposition | llm | StrOutputParser() | (lambda x: x.split("\n")))
-    rubrics = generate_queries_decomposition.invoke({"question":questions, "answer":answers})
-    generate_questions = ( get_questions | llm | StrOutputParser() | (lambda x: x.split("\n")))
-    qs = generate_questions.invoke({"question":questions, "answer":answers})
     def create_detector_agent(llm, system_message: str):
         """Create an agent."""
         prompt = ChatPromptTemplate.from_messages(
@@ -155,7 +250,6 @@ def grade_assignment_route():
         )
         prompt = prompt.partial(system_message=system_message)
         return prompt | llm | JsonOutputParser()
-
 
     def create_grader_agent(llm, system_message: str):
         """Create an agent."""
