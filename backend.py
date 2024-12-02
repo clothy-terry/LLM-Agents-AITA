@@ -1,25 +1,18 @@
 from flask import Flask, request, jsonify
-from werkzeug.utils import secure_filename
-from utils import (
-    functions
-)
 import os
-from retriever import GradingRetriever
 from config import Config
-from assignment import Assignment
-from human import Human
 import json
-from main_global import Global
 import bs4
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
 
-from langchain.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import Chroma, FAISS
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain.retrievers import BM25Retriever, EnsembleRetriever
+from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import functools
 
@@ -42,9 +35,11 @@ from typing_extensions import TypedDict
 from langchain_openai import ChatOpenAI
 
 from langchain_community.document_loaders import PyPDFLoader
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config.from_object(Config)
+CORS(app)
 documents = []
 splits = []
 ensemble_retriever = None 
@@ -103,7 +98,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Routes for handling input assignments PDFs
-@app.route('/upload', methods=['POST'])
+@app.route('/upload_assignment', methods=['POST'])
 def upload_assignment_pdf():
     """Endpoint to upload and convert PDF assignments to LaTeX"""
     global questions
@@ -121,8 +116,8 @@ def upload_assignment_pdf():
     file.save(file_path)
     loader = PyPDFLoader(file_path)
     pages = []
-    for page in loader.alazy_load():
-        pages.append(page)
+    for page in loader.lazy_load():
+        pages.append(page.page_content)
     combined_text = "\n".join(pages)
     question_answer_template = """You are a helpful assistant that gets the questions from a string of questions, based on the question number and subquestion letter. The questions are formatted with the number, and then the question. I just want the question. Each question/subquestion should separated by '\n'. Here is the entire question list {question}. The output should be 'question#: question'.
         Output (n question # - question pairs):"""
@@ -159,18 +154,6 @@ def upload_pdf():
             chunk_overlap=50  # Overlap between chunks
         )
         doc_splits = text_splitter.split_documents(documents)
-
-        pages = []
-        for page in loader.alazy_load():
-            pages.append(page)
-        combined_text = "\n".join(pages)
-        question_answer_template = """You are a helpful assistant that gets the questions from a string of questions, based on the question number and subquestion letter. The questions are formatted with the number, and then the question. I just want the question. Each question/subquestion should separated by '\n'. Here is the entire question list {question}. The output should be 'question#: question'.
-            Output (n question # - question pairs):"""
-        get_questions = ChatPromptTemplate.from_template(question_answer_template)
-        llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
-        generate_questions = (get_questions | llm | StrOutputParser() | (lambda x: x.split("\n")))
-
-        questions = generate_questions.invoke({"question":combined_text})
         
         splits.extend(doc_splits)
         result = len(doc_splits)
@@ -226,7 +209,7 @@ def index_course_material():
     # TODO
 
 # Route for grading and commenting assignments with multi-layer verification
-@app.route('/grade-assignment', methods=['POST'])
+@app.route('/grade_assignment', methods=['POST'])
 def grade_assignment_route():
     """Grade an assignment PDF using LLM and multi-layer agents for accuracy and hallucination reduction"""
     data = request.json
@@ -461,4 +444,4 @@ def grade_assignment_route():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

@@ -11,8 +11,8 @@ function UploadAssignment() {
     formData.append('course_id', '123');  // Example course_id
 
     try {
-      const response = await axios.post('http://localhost:5000/upload', formData);
-      alert('Assignment uploaded successfully');
+      const response = await axios.post('http://localhost:5000/upload_assignment', formData);
+      alert(response.data.message);
     } catch (error) {
       alert('Error uploading assignment: ' + error.response.data.error);
     }
