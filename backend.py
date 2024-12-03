@@ -46,6 +46,9 @@ ensemble_retriever = None
 questions = None
 ALLOWED_EXTENSIONS = {'pdf'}
 questions_and_rubric = []
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], operator.add]
@@ -126,7 +129,39 @@ def upload_assignment_pdf():
     generate_questions = (get_questions | llm | StrOutputParser() | (lambda x: x.split("\n")))
 
     questions = generate_questions.invoke({"question":combined_text})
+    logging.debug(f"Received Data: {questions}") 
     return jsonify({'message': 'File uploaded successfully'}), 200
+
+@app.route('/upload_answers', methods=['POST'])
+def upload_answer_pdf():
+    """Endpoint to upload and convert PDF assignments to LaTeX"""
+    global questions
+    # add converter and then we need llm agent to parse the file to get it in the format we want
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed, only PDFs are allowed'}), 400
+    
+    # Save the file
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(file_path)
+    loader = PyPDFLoader(file_path)
+    pages = []
+    for page in loader.lazy_load():
+        pages.append(page.page_content)
+    combined_text = "\n".join(pages)
+    answer_template = """You are a helpful assistant that gets the answers from a string of answers, based on the question number and subquestion letter. The answers are formatted with the number, and then it says 'Solution:' followed by the answer. Make sure to get the entire answer, and do not summarize or take the last part of answer. I just want the entire answer. Here are the answers {answer}. The output should be 'answer#: answer'.
+        Output (n answer# - answer pairs):"""
+    get_answers = ChatPromptTemplate.from_template(answer_template)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    generate_answers = (get_answers | llm | StrOutputParser() | (lambda x: x.split("\n")))
+
+    answers = generate_answers.invoke({"answer":combined_text})
+    logging.debug(f"Received Answers: {answers}") 
+    return jsonify({'message': 'Answers uploaded successfully'}), 200
 
 # Routes for handling input PDFs for RAG
 @app.route('/upload', methods=['POST'])
@@ -198,15 +233,6 @@ def combine_q_r():
 #     data = request.json.get('text_data')
 #     # TODO
 #     return jsonify({"detection_results": 'detection_results'}), 200
-
-# Routes for indexing course material
-@app.route('/index-course-material', methods=['POST'])
-def index_course_material():
-    """Endpoint to index course material (PDF/Docx)."""
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part in the request."}), 400
-    file = request.files['file']
-    # TODO
 
 # Route for grading and commenting assignments with multi-layer verification
 @app.route('/grade_assignment', methods=['POST'])
