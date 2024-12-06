@@ -1,0 +1,247 @@
+[
+    { 
+        "Question": "What process is used to remove metal fragments not completely removed in the machining process?", 
+        "Answer": "Deburring", 
+        "Context": "Deburring is the removal of metal fragments that are not completely removed in the machining process. These fragments, also known as burrs, can affect the performance, safety, and aesthetics of the machined parts." 
+    },
+    { 
+        "Question": "In powder metallurgy, what is the process called that involves applying pressure to the blended powder to form a coherent mass?", 
+        "Answer": "Compacting", 
+        "Context": "Compacting is the process of applying pressure to the blended powder to form a coherent mass with a specific shape and size. Compacting can be done by using a die and a punch, a roller, or an isostatic press. The compacted powder is called a green part, which has low strength and density." 
+    },
+    { 
+        "Question": "What is the main objective of Design for Assembly (DFA)?", 
+        "Answer": "Lower the assembly costs and improve the product quality and reliability", 
+        "Context": "Design for assembly (DFA) is a product design process that aims to optimize the product structure and the assembly process by reducing the number of components and minimizing the number of assembly operations required. The main objectives of DFA are to lower the assembly costs, improve the product quality and reliability, and shorten the time to market." 
+    },
+    { 
+        "Question": "What do rolling element bearings use to support a rotating shaft?", 
+        "Answer": "Balls, rollers, or needles", 
+        "Context": "Rolling element bearings are bearings that use balls, rollers, or needles to support a rotating shaft. The rolling elements reduce friction by rolling instead of sliding along the contact surface." 
+    },
+    { 
+        "Question": "What is a major advantage of using SEMS screws in assembly?", 
+        "Answer": "SEMS screws have a washer attached to the head", 
+        "Context": "Sems screws, which have a washer attached to the head; tapping screws, which create their own threads in the component as they are driven in." 
+    },
+    { 
+        "Question": "What does GD&T stand for in manufacturing?", 
+        "Answer": "Geometric Dimensioning and Tolerancing", 
+        "Context": "Geometric Dimensioning and Tolerancing (GD&T) is a system for defining and communicating engineering tolerances via a symbolic language on engineering drawings and computer-generated 3D models that describes a physical object's nominal geometry and the permissible variation thereof." 
+    },
+    { 
+        "Question": "Which machining process involves a rotating tool to create cylindrical parts?", 
+        "Answer": "Turning", 
+        "Context": "Turning is a machining process that involves the use of a cutting tool to remove material from a rotating workpiece." 
+    },
+    { 
+        "Question": "What is the difference between static and cold shut defects in cast metal parts?", 
+        "Answer": "Misrun is where the metal does not fill the mold cavity completely; Cold Shut is where two metal streams do not fuse properly.", 
+        "Context": "Misrun: A misrun is a defect where the metal does not fill the mold cavity completely, resulting in a thin or incomplete casting. Cold Shut: A cold shut is a defect where two streams of metal do not fuse properly in the mold cavity, creating a discontinuity or a crack in the casting." 
+    },
+    { 
+        "Question": "Which process in plastics manufacturing allows for recycling by allowing the plastic to be remelted?", 
+        "Answer": "Thermoplastics", 
+        "Context": "Thermoplastics are plastics that can be melted and remolded repeatedly without losing their properties." 
+    },
+    { 
+        "Question": "What is a key disadvantage of using large amounts of additives in polymer injection molding?", 
+        "Answer": "Additives can compromise mechanical properties when used in high volumes.", 
+        "Context": "Additives can compromise mechanical properties when used in high volumes." 
+    },
+    { 
+        "Question": "Which casting process is suitable for achieving complex geometries due to its use of wax patterns?", 
+        "Answer": "Investment casting (lost wax casting)", 
+        "Context": "Investment casting, also known as lost wax casting, is a process in which a wax pattern is coated with refractory material to create a mold." 
+    },
+    { 
+        "Question": "What is the primary reason for specifying the least tight tolerance that meets the quality and functionality of a machined part?", 
+        "Answer": "To avoid increased cost and difficulty of manufacturing.", 
+        "Context": "The goal of selecting a tolerance is to choose the least tight tolerance that results in acceptable quality and functionality... A too tight tolerance means that the part has to be made with very high precision, which increases the cost and difficulty of manufacturing." 
+    },
+    { 
+        "Question": "What does 'core shift' refer to in the context of casting defects?", 
+        "Answer": "A misalignment of the core in the mold cavity, resulting in a deviation from the desired shape or dimension of the casting.", 
+        "Context": "Core Shift: A core shift is a defect where there is a misalignment of the core in the mold cavity, resulting in a deviation from the desired shape or dimension of the casting." 
+    },
+    { 
+        "Question": "In addition to prototyping during the design process, what is another advantage of 3D printing technology?", 
+        "Answer": "3D printing technology allows for mass customization due to its flexibility in producing parts with varying designs.", 
+        "Context": "Additive manufacturing (AM)... offers several advantages for prototyping, such as speed, flexibility, and cost-effectiveness." 
+    },
+    { 
+        "Question": "What is considered when applying the Independence Axiom of Axiomatic Design in mechanical design?", 
+        "Answer": "Maintain the independence of the functional requirements (FRs).", 
+        "Context": "Axiom 1: The Independence Axiom. Maintain the independence of the functional requirements (FRs)." 
+    },
+    { 
+        "Question": "What type of prototype demonstrates the feasibility of a new technology or solution and is thus considered at the early design stage?", 
+        "Answer": "Proof-of-concept prototype", 
+        "Context": "A proof-of-concept prototype is a working model that demonstrates the feasibility of an idea." 
+    },
+    { 
+        "Question": "What process achieves complex part geometries using controlled pressure of molten material and a static die?", 
+        "Answer": "Permanent mold casting", 
+        "Context": "Permanent mold casting is a method of producing metal parts with molten metal under the pressure of gravity or a pressure feed system poured into a static mold." 
+    },
+    { 
+        "Question": "What is the main consideration that influences tool life and material removal rate (MRR) in grinding processes?", 
+        "Answer": "The strength of the cutting tool is the main factor that determines the speed and rate of material removal in grinding.", 
+        "Context": "The strength of the cutting tool is the main factor that determines the speed and rate of material removal in grinding." 
+    },
+    { 
+        "Question": "Which casting process involves creating a hollow cavity by dissolving pattern material?", 
+        "Answer": "Lost Foam Casting", 
+        "Context": "Lost Foam Casting is a process in which a foam pattern is coated with refractory material and placed in a sand mold. The mold is then filled with molten metal and the foam pattern evaporates." 
+    },
+    { 
+        "Question": "What design feature does the cone shape of the nozzle in a 3D printer help improve?", 
+        "Answer": "The cone shape helps improve the layer adhesion and surface finish of the printed part.", 
+        "Context": "The cone shape aids in consistent extrusion and substantial layer adhesion, enhancing the overall surface finish." 
+    },
+    { 
+        "Question": "What type of analysis would be used to determine how likely a product design will meet the customer needs based on a House of Quality (HOQ)?", 
+        "Answer": "Technical assessment", 
+        "Context": "Technical assessment: This is a section at the right of the HOQ, where the engineering characteristics are prioritized based on their importance and difficulty." 
+    },
+    { 
+        "Question": "What is the role of using heuristics in engineering design?", 
+        "Answer": "Heuristics simplify the problem and guide the search for a solution.", 
+        "Context": "Heuristics are rules of thumb or shortcuts that help simplify the problem and guide the search for a solution." 
+    },
+    { 
+        "Question": "Which type of allowance accounts for gaps or voids when parts do not fully fit or mesh?", 
+        "Answer": "Shrinkage void", 
+        "Context": "A shrinkage void is a defect where there is a cavity or a depression in the casting due to insufficient feeding of the molten metal during solidification." 
+    },
+    { 
+        "Question": "What is the significance of designing sheet metal with adequate bend allowances and clearances?", 
+        "Answer": "It accounts for material thickness, bend radius, and tooling dimensions.", 
+        "Context": "Provide adequate bend allowances, clearances and margins to account for the material thickness, bend radius, and tooling dimensions." 
+    },
+    { 
+        "Question": "What is a common characteristic of materials manufactured through powder metallurgy?", 
+        "Answer": "Powder metallurgy can produce materials with complex shapes, fine details, and high uniform density.", 
+        "Context": "Powder metallurgy can produce complex shapes with minimal material waste and high precision." 
+    },
+    { 
+        "Question": "What casting process uses a non-chemical method to create an impression in sand using a reusable metal pattern?", 
+        "Answer": "Shell Molding", 
+        "Context": "Shell molding is a process in which a thin shell of sand and resin is formed around a metal pattern." 
+    },
+    { 
+        "Question": "What is achieved by performing a SWOT analysis during the product design process?", 
+        "Answer": "Identify and prioritize the key factors that influence the product design opportunity.", 
+        "Context": "A SWOT analysis can help to identify and prioritize the key factors that influence the product design opportunity and to generate ideas for improvement or innovation." 
+    },
+    { 
+        "Question": "Regarding plastic processes, which of the following manufacturing methods generally generates hollow parts with a constant thickness?", 
+        "Answer": "Blow Molding", 
+        "Context": "Blow molding produces hollow parts with a thin, relatively constant thickness shell." 
+    },
+    { 
+        "Question": "What is one distinctive advantage of electroplating in manufacturing processes?", 
+        "Answer": "Electroplating can improve the appearance, corrosion resistance, and durability of the metal.", 
+        "Context": "Electroplating can be done over the whole workpiece or only on selected areas, depending on the desired outcome. Some of the benefits of electroplating are: It can improve the appearance, corrosion resistance, and durability of the metal." 
+    },
+    { 
+        "Question": "What manufacturing method starts with creating a coherent mass from metal powders and is utilized for complex shapes and fine details?", 
+        "Answer": "Powder Metallurgy", 
+        "Context": "Powder metallurgy is the process of manufacturing parts using metal powders. Composites can also be generated by combining metal powder with nonmetals, commonly ceramic. This enables designers to achieve specific material properties in their parts." 
+    },
+    { 
+        "Question": "Which casting defect is caused by low fluidity or inadequate mold design leading to incomplete fills?", 
+        "Answer": "Misrun", 
+        "Context": "Misrun: A misrun is a defect where the metal does not fill the mold cavity completely, resulting in a thin or incomplete casting. It is caused by low pouring temperature, high viscosity of the molten metal, insufficient fluidity, or improper design of the gating system." 
+    },
+    { 
+        "Question": "What principle needs to be considered to reduce the complexity of power conversion assemblies?", 
+        "Answer": "Chunks components into modules to standardize functions and processes.", 
+        "Context": "Modules enable standardization, where standard modules simplify design, manufacturing, and maintenance processes by reducing the number of different parts and interfaces." 
+    },
+    { 
+        "Question": "What distortion in casting occurs due to hasty cooling or imbalanced wall thickness leading to uneven closure alignment?", 
+        "Answer": "Warpage", 
+        "Context": "Warpage is a distortion that occurs due to imbalanced cooling or uneven walls that cause the material to shrink or buckle, resulting in misalignments." 
+    },
+    { 
+        "Question": "To what does 'Burrs' relate during machining operations?", 
+        "Answer": "Burrs are unwanted material fragments not completely removed in the machining process.", 
+        "Context": "Deburring is the removal of metal fragments that are not completely removed in the machining process. These fragments, also known as burrs, can affect the performance, safety, and aesthetics of the machined parts." 
+    },
+    { 
+        "Question": "What type of machining process would require brass dies and hydraulic systems?", 
+        "Answer": "Injection Molding", 
+        "Context": "Injection molding machines use dies, often made of hardened steel, to shape molten plastic injected into them under hydraulic pressure." 
+    },
+    { 
+        "Question": "What does the term 'springback' refer to in sheet metal processing?", 
+        "Answer": "Springback is the tendency of bent or stretched metal to return to its original shape, reducing accuracy.", 
+        "Context": "Spring back: This is the tendency of the sheet to return to its original shape after being bent or stretched." 
+    },
+    { 
+        "Question": "What does the term 'undercutting' mean in the context of welding defects?", 
+        "Answer": "Undercutting is when a groove or notch forms along the edge of the weld, reducing its cross-sectional area.", 
+        "Context": "Undercutting can result from excessive heat input... creating a groove or notch that reduces the cross-sectional area and makes it prone to cracking." 
+    },
+    { 
+        "Question": "In bonding techniques, what process uses high-frequency vibrations to create heat and pressure at the interface of two parts?", 
+        "Answer": "Ultrasonic welding", 
+        "Context": "Ultrasonic welding: This type of welding uses high-frequency vibrations to create heat and pressure at the interface of two metal parts." 
+    },
+    { 
+        "Question": "What does a GD&T 'Flatness' tolerance control?", 
+        "Answer": "Flatness controls the deviation of a surface from a perfect plane.", 
+        "Context": "Flatness: A form tolerance that controls the deviation of a surface from a perfect plane. It can be applied to any surface, regardless of its size or shape." 
+    },
+    { 
+        "Question": "What purpose does the flange serve in a flanging process for sheet metal work?", 
+        "Answer": "The flange is used to bend the edge of the sheet at an angle.", 
+        "Context": "Flanging... The tool used for flanging is called a flange, which has a groove or a notch that fits the edge of the sheet." 
+    },
+    { 
+        "Question": "Which machining process involves shaping a workpiece by rotating it against a cutting tool?", 
+        "Answer": "Turning", 
+        "Context": "Turning is a machining process that involves the use of a cutting tool to remove material from a rotating workpiece." 
+    },
+    { 
+        "Question": "What is the primary reason for defining the envelope of operation in design contexts?", 
+        "Answer": "To determine the range of conditions the system must operate within and reduce the design space to feasible solutions.", 
+        "Context": "Constraints at the system level lead to constraints at the assembly and component level. Therefore, it is important to define the envelope of operation, which is the range of conditions and parameters that the system must operate within, to reduce the design space to feasible solutions." 
+    },
+    { 
+        "Question": "What type of machining process is used to improve tight tolerance fits by using an abrasive tool?", 
+        "Answer": "Honing", 
+        "Context": "Honing is an abrasive process that uses a rotating tool with abrasive particles to remove material from the surface of a workpiece. Honing is often needed for tight tolerance fits, such as in bearings, cylinders, valves, and gears." 
+    },
+    { 
+        "Question": "While designing a mechanism, why is considering the 'Transmission Angle' crucial?", 
+        "Answer": "It assesses efficiency for force transmission within a mechanism.", 
+        "Context": "The minimum transmission angle indicates how efficiently force and power are transmitted through the mechanism." 
+    },
+    { 
+        "Question": "Which manufacturing process allows for achieving surface features using layering, beneficial for producing intricate and detailed geometries?", 
+        "Answer": "Additive Manufacturing (3D Printing)", 
+        "Context": "Additive manufacturing (AM) offers several advantages for prototyping, such as speed, flexibility, and cost-effectiveness. AM can also enable new design possibilities that are not feasible with traditional manufacturing methods." 
+    },
+    { 
+        "Question": "What type of soldering defect arises from cleaning or wetting issues leading to incomplete melt?", 
+        "Answer": "Balling", 
+        "Context": "Balling is a defect that arises from cleaning or wetting issues leading to incomplete melt, thus not spreading correctly across the joint." 
+    },
+    { 
+        "Question": "In the context of manufacturing using gears, what does the 'gear ratio' refer to?", 
+        "Answer": "The ratio of the number of teeth on the output gear to the number of teeth on the input gear.", 
+        "Context": "Gear ratio: This is the ratio of the number of teeth on the output gear to the number of teeth on the input gear." 
+    },
+    { 
+        "Question": "What kind of energy conversion is involved in linear actuation when using solenoid?", 
+        "Answer": "Electrical energy into linear mechanical energy.", 
+        "Context": "Electrical linear actuators involve the conversion of electrical energy into linear mechanical energy." 
+    },
+    { 
+        "Question": "What is the primary characteristic of the broaching process?", 
+        "Answer": "Broaching uses a toothed tool to create precise holes or slots.", 
+        "Context": "Broaching is a machining process that uses a toothed tool called a broach to create holes or slots in a workpiece." 
+    }
+]
