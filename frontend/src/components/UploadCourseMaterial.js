@@ -8,7 +8,6 @@ function UploadCourseMaterial() {
     e.preventDefault();
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('course_id', '123');  // Example course_id
 
     try {
       const response = await axios.post('http://localhost:5000/index-course-material', formData);
