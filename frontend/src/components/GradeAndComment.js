@@ -5,6 +5,7 @@ import axios from 'axios';
 
 function GradeAndComment() {
   const [result, setResult] = useState([]);
+  const [grade, setGrade] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,7 +14,9 @@ function GradeAndComment() {
         course_id: '123',  // Example course_id
         assignment_id: '456',  // Example assignment_id
       });
-      setResult(response.data.message);
+      const { feedback, totalGrade } = response.data; 
+      setResult(feedback);
+      setGrade(totalGrade);
     } catch (error) {
       alert('Error grading assignment: ' + error.response.data.error);
     }
@@ -27,12 +30,10 @@ function GradeAndComment() {
         <h3>Results:</h3>
         {result.map((res, index) => (
           <div key={index}>
-            <p>Question: {res.question}</p>
-            <p>Answer: {res.student_answer}</p>
-            <p>Grade: {res.grade}</p>
-            <p>Feedback: {res.feedback}</p>
+            <p>Question: {res}</p>
           </div>
         ))}
+        {grade !== null && <p>Grade: {grade}</p>} {/* Display grade if available */}
       </div>
     </div>
   );
