@@ -1,25 +1,18 @@
 from flask import Flask, request, jsonify
-from werkzeug.utils import secure_filename
-from utils import (
-    functions
-)
 import os
-from retriever import GradingRetriever
 from config import Config
-from assignment import Assignment
-from human import Human
 import json
-from main_global import Global
 import bs4
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
 
-from langchain.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import Chroma, FAISS
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain.retrievers import BM25Retriever, EnsembleRetriever
+from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import functools
 
@@ -30,6 +23,7 @@ from langchain_core.messages import (
     HumanMessage,
     ToolMessage,
 )
+import re
 from typing import Literal
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -42,15 +36,23 @@ from typing_extensions import TypedDict
 from langchain_openai import ChatOpenAI
 
 from langchain_community.document_loaders import PyPDFLoader
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config.from_object(Config)
+CORS(app)
 documents = []
 splits = []
 ensemble_retriever = None 
 questions = None
 ALLOWED_EXTENSIONS = {'pdf'}
-questions_and_rubric = []
+questions_and_rubric = None
+rubrics = None
+answers = None
+qra = None
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], operator.add]
@@ -103,7 +105,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Routes for handling input assignments PDFs
-@app.route('/upload', methods=['POST'])
+@app.route('/upload_assignment', methods=['POST'])
 def upload_assignment_pdf():
     """Endpoint to upload and convert PDF assignments to LaTeX"""
     global questions
@@ -121,17 +123,127 @@ def upload_assignment_pdf():
     file.save(file_path)
     loader = PyPDFLoader(file_path)
     pages = []
-    for page in loader.alazy_load():
-        pages.append(page)
+    for page in loader.lazy_load():
+        pages.append(page.page_content)
     combined_text = "\n".join(pages)
-    question_answer_template = """You are a helpful assistant that gets the questions from a string of questions, based on the question number and subquestion letter. The questions are formatted with the number, and then the question. I just want the question. Each question/subquestion should separated by '\n'. Here is the entire question list {question}. The output should be 'question#: question'.
+    question_answer_template = """You are a helpful assistant that gets the questions from a string of questions, based on the question number and subquestion letter. The questions are formatted with the number, and if there are subqestions, then the letter would be there, and finally the question. I just want the question. Each question/subquestion should separated by '\n'. Here is the entire question list {question}. The output should be 'question/subquestion#: question'.
         Output (n question # - question pairs):"""
     get_questions = ChatPromptTemplate.from_template(question_answer_template)
     llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
     generate_questions = (get_questions | llm | StrOutputParser() | (lambda x: x.split("\n")))
 
-    questions = generate_questions.invoke({"question":combined_text})
+    qs = generate_questions.invoke({"question":combined_text})
+    questions = []
+    for question in qs: 
+        if question.strip():
+            questions.append(question.strip())
+    logging.debug(f"Received Data: {questions}") 
     return jsonify({'message': 'File uploaded successfully'}), 200
+
+def split_points(strings):
+    # Split by the pattern: lookahead to split before "+number:" and "-number:"
+    segments = re.split(r'(?=[+-]\d+:)', strings)
+    
+    # Remove any leading/trailing whitespaces
+    lst = [segment.strip() for segment in segments if segment]
+
+    if not lst:
+        return []
+    
+    # Extract the prefix (first element) and the rest of the list
+    prefix = lst[0]
+    # Combine the prefix with each of the remaining elements in the list
+    return [f'{prefix} {item}' for item in lst[1:]]
+    
+# Routes for handling input assignments PDFs
+@app.route('/upload_rubric', methods=['POST'])
+def upload_rubric():
+    """Endpoint to upload and convert PDF assignments to LaTeX"""
+    global questions, rubrics
+    # add converter and then we need llm agent to parse the file to get it in the format we want
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed, only PDFs are allowed'}), 400
+    # if not questions:
+    #     return jsonify({'error': 'First upload questions'}), 400
+
+    # Save the file
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(file_path)
+    loader = PyPDFLoader(file_path)
+    pages = []
+    for page in loader.lazy_load():
+        pages.append(page.page_content)
+    combined_text = "\n".join(pages)
+    rubric_template = """You are a helpful assistant that gets the rubric items, based on the question number and subquestion letter. The rubrics are formatted with the number, and if there are subqestions, then the letter would be there, and finally the rubric items which contains the quantity of points and condition for the points in the respective order. I just want the rubric items. Each question/subquestion should separated by '\n'. Here is the entire rubric list {rubric}. The output should simply be the rubric items for each subquestion, and do not include the question and subquestion# in the output. Remember to include the number of points which is '+ number' or '- number', and the condition, like 'condition: points'. I WANT all rubric items for the same subquestion to be in the same string. Pretty much, separate the rubric based on subquestions, using '\n'.
+        Output (n rubric # - rubric pairs):"""
+    get_rubric = ChatPromptTemplate.from_template(rubric_template)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    generate_rubric = (get_rubric | llm | StrOutputParser() | (lambda x: x.split("\n")))
+    rubrics = generate_rubric.invoke({"rubric":combined_text})
+    rubrics = [s.strip() for s in rubrics]
+    if len(questions) != len(rubrics):
+        return jsonify({'error': f"Unequal number of questions and rubric items: {len(questions)}, {len(rubrics)}"}), 400
+    rubrics = [split_points(rubric) for rubric in rubrics]
+
+    # Define the regex pattern to match and remove
+    # pattern = r"^\d\(?[a-zA-Z]\)?[.+]*[.:]"  # Number → Letter → Period at the start
+
+    # Process each string
+    # rubrics = [re.sub(pattern, '', s, count=1).strip() for s in stripped_strings]
+
+    logging.debug(f"Received Rubric: {rubrics}") 
+    
+    combine()
+    return jsonify({'message': 'File uploaded successfully'}), 200
+
+@app.route('/upload_answers', methods=['POST'])
+def upload_answer_pdf():
+    """Endpoint to upload and convert PDF assignments to LaTeX"""
+    global questions, answers
+    # add converter and then we need llm agent to parse the file to get it in the format we want
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed, only PDFs are allowed'}), 400
+    if not questions:
+        return jsonify({'error': 'Assignment pdf needs to be uploaded'}), 400
+    
+    # Save the file
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(file_path)
+    loader = PyPDFLoader(file_path)
+    pages = []
+    for page in loader.lazy_load():
+        pages.append(page.page_content)
+    combined_text = "\n".join(pages)
+    answer_template = """You are a helpful assistant that gets the answers from a string of answers, based on the question number and subquestion letter. The answers are formatted with the number, and then it says 'Solution:' followed by the answer. I just want you to get the answer for each subquestion. \\
+        Make sure to get the entire answer, and do not summarize or take the last part of answer. I just want the entire answer. You can determine the number of questions from the question list. Here is the question list {question}. Just use the question list to determine the number of questions. Here are the student answers {answer}. The output should be 'answer#: answer'. \\
+        If you do not see an answer corresponding to a particular question number/subquestion, I still want an answer to that question in the answer list, so just write 'answer#: I do not know the answer'. Do not have empty strings in the list between the answers. If there are subanswers, the main question should not have an answer. 
+        Output (n answer# - answer pairs):"""
+    get_answers = ChatPromptTemplate.from_template(answer_template)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    generate_answers = (get_answers | llm | StrOutputParser() | (lambda x: x.split("\n")))
+
+    answers = generate_answers.invoke({"answer":combined_text, "question": questions})
+    # answers = ["Student Answer: " + s[s.index('.') + 1:] if '.' in s else s for s in answers]
+    answers = [s.strip() for s in answers]
+
+    # # Define the regex pattern to match and remove
+    # pattern = r"^\d[a-zA-Z]\."  # Number → Letter → Period at the start
+
+    # # Process each string
+    # answers = [re.sub(pattern, '', s, count=1).strip() for s in stripped_strings]
+
+    logging.debug(f"Received Answers: {answers}") 
+    return jsonify({'message': 'Answers uploaded successfully'}), 200
 
 # Routes for handling input PDFs for RAG
 @app.route('/upload', methods=['POST'])
@@ -159,18 +271,6 @@ def upload_pdf():
             chunk_overlap=50  # Overlap between chunks
         )
         doc_splits = text_splitter.split_documents(documents)
-
-        pages = []
-        for page in loader.alazy_load():
-            pages.append(page)
-        combined_text = "\n".join(pages)
-        question_answer_template = """You are a helpful assistant that gets the questions from a string of questions, based on the question number and subquestion letter. The questions are formatted with the number, and then the question. I just want the question. Each question/subquestion should separated by '\n'. Here is the entire question list {question}. The output should be 'question#: question'.
-            Output (n question # - question pairs):"""
-        get_questions = ChatPromptTemplate.from_template(question_answer_template)
-        llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
-        generate_questions = (get_questions | llm | StrOutputParser() | (lambda x: x.split("\n")))
-
-        questions = generate_questions.invoke({"question":combined_text})
         
         splits.extend(doc_splits)
         result = len(doc_splits)
@@ -189,24 +289,32 @@ def upload_pdf():
     else:
         return jsonify({"error": result}), 500
 
-@app.route('/combine_q_r', methods=['POST'])
-def combine_q_r():
-    global questions_and_rubric
-
-    data = request.json
-    rubrics = data.get('rubrics')
+def combine():
+    global questions_and_rubric, questions, rubrics
     questions_and_rubric = []
-    for i in range(len(questions)):
-        questions_and_rubric.append([])
-        if not questions[i]['subfields']:
-            for j in range(len(rubrics[i])):
-                questions_and_rubric[-1].append(questions[i] + " - " + rubrics[i][j])
-        else:
-            for j in range(len(questions[i]['subfields'])):
-                questions_and_rubric[-1].append([])
-                for k in range(len(rubrics[i][j])):
-                    questions_and_rubric[-1][-1].append(questions[i]['subfields'][j] + " - " + rubrics[i][j][k])
-    return jsonify({'message': 'Combined questions and rubric successfully'}), 200
+    for prefix, sublist in zip(questions, rubrics):
+        # Add the prefix to each string in the corresponding sublist
+        questions_and_rubric.append([prefix + item for item in sublist])
+    logging.debug(f"Received q_r: {questions_and_rubric}") 
+    
+# @app.route('/combine_q_r', methods=['POST'])
+# def combine_q_r():
+#     global questions_and_rubric
+
+#     data = request.json
+#     rubrics = data.get('rubrics')
+#     questions_and_rubric = []
+#     for i in range(len(questions)):
+#         questions_and_rubric.append([])
+#         if not questions[i]['subfields']:
+#             for j in range(len(rubrics[i])):
+#                 questions_and_rubric[-1].append(questions[i] + " - " + rubrics[i][j])
+#         else:
+#             for j in range(len(questions[i]['subfields'])):
+#                 questions_and_rubric[-1].append([])
+#                 for k in range(len(rubrics[i][j])):
+#                     questions_and_rubric[-1][-1].append(questions[i]['subfields'][j] + " - " + rubrics[i][j][k])
+#     return jsonify({'message': 'Combined questions and rubric successfully'}), 200
 
 # # Route for AI-generated content detection
 # @app.route('/detect-ai-content', methods=['POST'])
@@ -216,26 +324,40 @@ def combine_q_r():
 #     # TODO
 #     return jsonify({"detection_results": 'detection_results'}), 200
 
-# Routes for indexing course material
-@app.route('/index-course-material', methods=['POST'])
-def index_course_material():
-    """Endpoint to index course material (PDF/Docx)."""
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part in the request."}), 400
-    file = request.files['file']
-    # TODO
+def combine_ra():
+    global questions_and_rubric, answers, questions, qra
+    qra = []
+    for sublist, suffix in zip(questions_and_rubric, answers):
+        # Add the prefix to each string in the corresponding sublist
+        qra.append([item + suffix for item in sublist])
+    logging.debug(f"Received qra: {qra}") 
+    qa = []
+    for prefix, suffix in zip(questions, answers):
+        # Add the prefix to each string in the corresponding sublist
+        qa.append(prefix + suffix)
+    return qa
 
 # Route for grading and commenting assignments with multi-layer verification
-@app.route('/grade-assignment', methods=['POST'])
+@app.route('/grade_assignment', methods=['POST'])
 def grade_assignment_route():
     """Grade an assignment PDF using LLM and multi-layer agents for accuracy and hallucination reduction"""
-    data = request.json
-    answers = data.get("answers")
-    qra = []
-    for i in range(len(answers)):
-        qra.append([])
-        for j in range(questions_and_rubric[i]):
-            qra[-1].append(questions_and_rubric[i][j] + " :  " + answers[i])
+    # Prompt to decompose rubric items into list of elements where each element contains Question #, Question, Rubric, Student Answer; each element is separated based on rubric item"
+    global questions_and_rubric, answers, qra, questions
+    # template = """You are a helpful assistant that divides the rubric/answer key and the student answers into separate entries. Each entry includes the question number, question, rubric item on what content would reward/deduct points for the answer, and then the question number and letter, followed by the entire answer. Do not output multiple rubric items at once. \n
+    # The goal is to break down the rubric into a set of rubric items that can be checked in isolation. \n
+    # Divide the rubric into separate items. For example if the question numbers are 1, 2a, 2b, 2c, 3, 4, each question will be divided and then the following rubric items and the student answer will be for the question. Ensure that the number of items for each question corresponds to the number of rubric items where points are rewarded or deducted. Do not make up rubric items. Follow the following rubric entirely. You are grounded by this rubric, so everything comes from this rubric.  \n
+    # Strictly format the division of the rubric into 'question #: question: rubric item: student answer', and if there are multiple rubric items for each question, then separate each item into separate entries, but maintain the same question number, question and answer. Therefore, each rubric item for the same question should have the same question number, question, and answer.  \n
+    # Make sure the question #, question, and rubric item, and it follows the rubric entirely to a tee. The answer must be grounded as well, and use only the student answers provided to divide them. Each element in the list of rubric items should consist of an non-empty string of a rubric item, and each element should have the question #, question, rubric item and answer in one string. If the student answer is empty, simply add 'N/A' at the end of the rubric item. Make sure there is only one rubric point item per entry, and do not repeat entries. Here is the entire rubric list  {question}. Here are the student answers {answer}\n
+    # Do not have empty rubric items. Do not output the entire rubric at the beginning of this decomposition. I only want sub-rubric items. Each sub-rubric item should be the same question#, same question, different item, and then the same answer. Each sub-rubric item should be corresponding to a separate number of points. Each sub-rubric item should be separated by '\n', and each subquestion should be separated by '\n-\n'. Output (n rubric items):"""
+    # prompt_decomposition = ChatPromptTemplate.from_template(template)
+    # llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    # qa = [question + ' ' + answer for question, answer in zip(questions, answers)]
+    # generate_queries_decomposition = ( prompt_decomposition | llm | StrOutputParser() | (lambda x: x.split("\n")))
+    # qra = generate_queries_decomposition.invoke({"question":" \n ".join(questions_and_rubric), "answer":" \n ".join(answers)})
+    # logging.debug(f"Received qra: {qra}") 
+    qa = combine_ra()
+    logging.debug(f"Received qa: {qa}") 
+    # return jsonify({"message": 10}), 200
     llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
     def create_detector_agent(llm, system_message: str):
         """Create an agent."""
@@ -307,61 +429,63 @@ def grade_assignment_route():
             # if answers:
                 # q_a_pair = format_qa_pair(prev_q,answers[-1])
                 # q_a_pairs = q_a_pairs + "\n---\n"+  q_a_pair
-            if messages:
-                if name == "Grader":
-                    # get the last grade and review 
-                    if ensemble_retriever:
-                        current_state = {
-                                "messages": [HumanMessage(content=question)] + [messages[-len(questions)+i]],
+            answers.append([])
+            for j, subquestion in enumerate(question):
+                if messages:
+                    if name == "Grader":
+                        # get the last grade and review 
+                        if ensemble_retriever:
+                            current_state = {
+                                    "messages": [HumanMessage(content=subquestion)] + [messages[-len(questions)+i][j]],
+                                    "sender": name,
+                                    # "q_a_pairs": q_a_pairs,
+                                    # "context": ensemble_retriever.invoke(q)
+                            }
+                        else:
+                            current_state = {
+                                "messages": [HumanMessage(content=subquestion)] + [messages[-len(questions)+i][j]],
                                 "sender": name,
                                 # "q_a_pairs": q_a_pairs,
-                                # "context": ensemble_retriever.invoke(q)
-                        }
+                            }
+                    # get the last grade given to review 
                     else:
-                        current_state = {
-                            "messages": [HumanMessage(content=question)] + [messages[-len(questions)+i]],
-                            "sender": name,
-                            # "q_a_pairs": q_a_pairs,
-                        }
-                # get the last grade given to review 
+                        if ensemble_retriever: 
+                            current_state = {
+                                    "messages": [HumanMessage(content=subquestion)] + [messages[-len(questions)+i][j]],
+                                    "sender": name,
+                                    # "q_a_pairs": q_a_pairs,
+                                    # "context": ensemble_retriever.invoke(q)
+                            }
+                        else:
+                            current_state = {
+                                "messages": [HumanMessage(content=subquestion)] + [messages[-len(questions)+i][j]],
+                                "sender": name,
+                                # "q_a_pairs": q_a_pairs,
+                            }
                 else:
                     if ensemble_retriever: 
                         current_state = {
-                                "messages": [HumanMessage(content=question)] + [messages[-len(questions)+i]],
-                                "sender": name,
-                                # "q_a_pairs": q_a_pairs,
-                                # "context": ensemble_retriever.invoke(q)
+                            "messages": [HumanMessage(content=subquestion)],
+                            "sender": name,
+                            # "q_a_pairs": q_a_pairs,
+                            # "context": ensemble_retriever.invoke(q)
                         }
                     else:
                         current_state = {
-                            "messages": [HumanMessage(content=question)] + [messages[-len(questions)+i]],
+                            "messages": [HumanMessage(content=subquestion)],
                             "sender": name,
                             # "q_a_pairs": q_a_pairs,
                         }
-            else:
-                if ensemble_retriever: 
-                    current_state = {
-                        "messages": [HumanMessage(content=question)] + [messages[-len(questions)+i]],
-                        "sender": name,
-                        # "q_a_pairs": q_a_pairs,
-                        # "context": ensemble_retriever.invoke(q)
-                    }
-                else:
-                    current_state = {
-                        "messages": [HumanMessage(content=question)],
-                        "sender": name,
-                        # "q_a_pairs": q_a_pairs,
-                    }
-            prev_q = question
-            result = agent.invoke(current_state)
-            answers.append(result.content)
+                prev_q = question
+                result = agent.invoke(current_state)
+                answers[-1].append(result.content)
         # We convert the agent output into a format that is suitable to append to the global state
         # all_answers = "\n".join(answers)
         # result = AIMessage(content=all_answers, **result.dict(exclude={"content", "type", "name"}), name=name)
         # result = AIMessage(**result.dict(exclude={"type", "name"}), name=name)
         if name == "Reviewer":
             return {
-                "messages": [message + " " + answer for message,answer in zip(messages[-len(answers):], answers)],
+                "messages": [[message + " Review:" + answer for message,answer in zip(row1, row2)] for row1, row2 in zip(messages[-len(answers):], answers)],
                 "sender": name,
             }
         if name == "Grader":
@@ -369,27 +493,26 @@ def grade_assignment_route():
                 "messages": answers,
                 "sender": name,
             }
-
     # AI Detector agent and node
     detector_agent = create_detector_agent(
         llm,
         system_message="You should determine whether there is AI-content in the student answers with a score from [0.0 - 100.0], which is the magnitude of AI-content generation. In the lines you output for the AI-generation, make sure those lines are actually in the student answer and no hallucination is there. If you don't think there is AI-generated content, do not add anything to the lines.",
     )
-    detector_node = functools.partial(detector_node, agent=detector_agent, name="Detector", items=qs)
+    detector_node = functools.partial(detector_node, agent=detector_agent, name="Detector", items=qa)
 
     # Grader agent and node
     grader_agent = create_grader_agent(
         llm,
         system_message="You should grade the student answers based on the rubric to the best of your ability. Do not go against the rubric information and assume anything on your own. Do not assume typos, go with what is given to you. Treat each rubric item as a condition, and negative points should be rewarded if the condition is satisfied. Do not take semantics of the rubric into account. Rubric is the truth. Scores can only be 0 or the points shown in the rubric item. ",
     )
-    grader_node = functools.partial(agent_node, agent=grader_agent, name="Grader", questions=questions)
+    grader_node = functools.partial(agent_node, agent=grader_agent, name="Grader", questions=qra)
 
     # Reviewer agent and node
     review_agent = create_reviewer_agent(
         llm,
         system_message="You should make sure the grader follows the rubric primarily. Do not go against the rubric information and assume anything on your own. If the answer satisfies the rubric, do not give a reason to not give the point. Only follow the current rubric item. Other rubric items should not affect your judgement.Do not assume typos, go with what is given to you. If the points are rewarded, do not mention anything in the explanation, except the fact that it satisfied whatever is on the rubric. For negative rubric points, treat it as a binary option between 0 and the negative value, so if the rubric condition is true, then give it the negative points, else if the rubric requirement is not satisfied, give it 0 if there are negative points. If the points rewarded align, then make sure to start with 'FINAL POINTS:', else start with 'WRONG POINTS:' 'WRONG POINTS:' is given only if the score given by you is not the same as the score given by the grader, do not misuse it."
     )
-    reviewer_node = functools.partial(agent_node, agent=review_agent, name="Reviewer", questions=questions)
+    reviewer_node = functools.partial(agent_node, agent=review_agent, name="Reviewer", questions=qra)
 
     def router(state):
         """
@@ -409,20 +532,21 @@ def grade_assignment_route():
         if state["sender"] == "Reviewer" or state["sender"] == "Grader":
             messages = state["messages"]
             # last_message = messages[-1]
-            if not "WRONG POINTS" in " ".join(messages[-len(questions):]) and state["sender"] == "Reviewer":
+            if not any("WRONG POINTS" in item for sublist in messages[-len(questions):] for item in sublist) and state["sender"] == "Reviewer":
                 # Only the specified agent is allowed to end the process
                 return END
+
             return "continue"
     workflow = StateGraph(AgentState)
-    workflow.add_node("Detector", detector_node)
+    # workflow.add_node("Detector", detector_node)
     workflow.add_node("Grader", grader_node)
     workflow.add_node("Reviewer", reviewer_node)
 
-    workflow.add_conditional_edges(
-        "Detector",
-        router,
-        {"continue": "Grader", END: END},
-    )
+    # workflow.add_conditional_edges(
+    #     "Detector",
+    #     router,
+    #     {"continue": "Grader", END: END},
+    # )
 
     workflow.add_conditional_edges(
         "Grader",
@@ -436,9 +560,9 @@ def grade_assignment_route():
         {"continue": "Grader", END: END},
     )
 
-    workflow.add_edge(START, "Detector")
+    # workflow.add_edge(START, "Detector")
+    workflow.add_edge(START, "Grader")
     graph = workflow.compile()
-
     events = graph.stream(
         {
             "messages": [
@@ -447,18 +571,43 @@ def grade_assignment_route():
         # Maximum number of steps to take in the graph
         {"recursion_limit": 10},
     )
-
+    last_response = None
     try:
+        # print(events)
         for s in events:
-            print(s)
+            # print(s)
             print("----")
+            if "Grader" in s:
+                last_response = s
     except Exception as e:
         print(e)
         print(f"final grade")
-    # print(questions)
-    return jsonify({"grade": 'grade'}), 200
-    
-
-
+        logging.debug(f"Received error: ERRORRR") 
+    logging.debug(f"Received grade: {last_response["Grader"]['messages']}")
+    grade = last_response["Grader"]['messages']
+    score = []
+    summarize_grader_template = """You are a helpful assistant that gets feedback from a grader that will be given to a student for their answers, and the feedback will be right after each other in a single string. I want you to create an informative summary of the feedback that will still convey the main information on what they did right or wrong, but I just want it smaller and less redundant.  Here is the entire feedback list {feedback}. The output should be 'feedback summary'. Do not output anything other than the summary, with no exception.
+        Output (feedback summary):"""
+    get_summary = ChatPromptTemplate.from_template(summarize_grader_template)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    generate_summary = (get_summary | llm | StrOutputParser())
+    final_score = 0
+    for i in range(len(grade)):
+        total = 0
+        string = ""
+        for j in range(len(grade[i])):
+            # match = re.search(r'score:\s*(\d+)(?=:|$)', grade[i][j])
+            match = re.search(r'score:\s*(\d+):\s*(.*)', grade[i][j])
+            if match:
+                total += int(match.group(1))  
+                string = string + match.group(2) + " "
+            else:
+                total += 0
+        s = qra[i][0].split(':')[0] +  ". " + "Score: " + str(total) + " " + generate_summary.invoke({"feedback":string})
+        score.append(s)
+        final_score += total
+    # print(score)
+    # feedback = generate_summary.invoke({"feedback":combined_text})
+    return jsonify({"feedback": score, "totalGrade": final_score}), 200
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

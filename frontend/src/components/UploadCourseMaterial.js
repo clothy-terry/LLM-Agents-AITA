@@ -10,7 +10,7 @@ function UploadCourseMaterial() {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('http://localhost:5000/index-course-material', formData);
+      const response = await axios.post('http://localhost:5000/upload', formData);
       alert(response.data.message);
     } catch (error) {
       alert('Error uploading course material: ' + error.response.data.error);
