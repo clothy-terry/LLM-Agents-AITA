@@ -607,7 +607,7 @@ def grade_assignment_route():
         print(e)
         print(f"final grade")
         logging.debug(f"Received error: ERRORRR") 
-    logging.debug(f"Received grade: {last_response["Grader"]['messages']}")
+    logging.debug(f"Received grade: {last_response['Grader']['messages']}")
     grade = last_response["Grader"]['messages']
     score = []
     summarize_grader_template = """You are a helpful assistant that gets feedback from a grader that will be given to a student for their answers, and the feedback will be right after each other in a single string. I want you to create an informative summary of the feedback that will still convey the main information on what they did right or wrong, but I just want it smaller and less redundant.  Here is the entire feedback list {feedback}. The output should be 'feedback summary'. Do not output anything other than the summary, with no exception.

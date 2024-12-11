@@ -1,0 +1,8 @@
+Flask
+flask-cors
+bs4
+langchain-openai
+langchain-core
+langchain-community
+langgraph
+typing-extensions
