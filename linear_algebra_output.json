@@ -1,0 +1,217 @@
+[
+    {
+        "question": "What inequality must be true between the rank r and the number of rows m of a matrix?",
+        "explanation": "The reference answer states that the rank r must be less than or equal to the number of rows m (r \u2264 m). The student's answer expands on this by correctly stating that the rank r must also be greater than or equal to 0 (0 \u2264 r). Therefore, the student's answer is more comprehensive as it includes both bounds for r, while the reference answer only provides one side of the inequality. However, the core inequality (r \u2264 m) is still present in the student's answer. Overall, the student's answer is correct and helpful, providing a complete understanding of the relationship between rank and the number of rows.",
+        "rating": "9"
+    },
+    {
+        "question": "What inequality must be true between the rank r and the number of columns n of a matrix?",
+        "explanation": "The reference answer states that the rank r must be less than or equal to the number of columns n, which is correct. The student's answer expands this to '0 \u2264 r \u2264 n', which is also correct because it includes the non-negativity of rank. However, the reference answer is more concise and directly answers the question. The student's answer is not incorrect, but it is more verbose than necessary.",
+        "rating": "8"
+    },
+    {
+        "question": "What is the dimension of the left nullspace of a matrix with rank r and m rows?",
+        "explanation": "The candidate's answer is correct and matches the reference answer exactly. The dimension of the left nullspace is indeed calculated as m - r, where m is the number of rows and r is the rank of the matrix. There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "When is the equation ATy = d solvable?",
+        "explanation": "The reference answer states that the equation ATy = d is solvable when d is in the row space of A. The student's answer correctly states that d must lie in the column space of A\u1d57, which is equivalent to the row space of A. Both answers convey the same condition, but the student's phrasing could lead to confusion as it suggests a different perspective. However, since the condition is ultimately correct, the student's answer should not be penalized. Therefore, the rating should reflect the correctness of the answer.",
+        "rating": "8"
+    },
+    {
+        "question": "When is the solution y for the equation ATy = d unique?",
+        "explanation": "The reference answer states that the solution is unique when the left nullspace contains only the zero vector. The student's answer correctly identifies that this condition is equivalent to the nullspace of A\u1d57 containing only the zero vector, which is a valid interpretation. However, the student's answer introduces the rank condition (r = m) without explicitly connecting it to the uniqueness condition stated in the reference answer. While the student's answer is correct, it could be clearer in linking the concepts of nullspace and uniqueness. Overall, the answer is mostly correct but lacks clarity in connecting the concepts.",
+        "rating": "7"
+    },
+    {
+        "question": "How can the 3 by 3 identity matrix be expressed as a combination of the other five permutation matrices?",
+        "explanation": "The student's answer indicates a complete lack of knowledge regarding the expression of the identity matrix in terms of permutation matrices. The reference answer provides a specific mathematical expression that combines the permutation matrices to yield the identity matrix. The student's response does not attempt to engage with the question or provide any relevant information, which is a significant omission. Therefore, the score should reflect that the student did not provide any attempt at an answer.",
+        "rating": "0"
+    },
+    {
+        "question": "What is the form of the coefficients c1, c2, c3, c4, and c5 when c1P1 + c2P2 + c5P5 = 0 for the five permutation matrices?",
+        "explanation": "The reference answer specifies that c1, c2, and c3 must be zero, while c4 and c5 must also be zero. The student's answer, 'I don't know', fails to provide any information or attempt to answer the question, which is a significant omission. This response does not demonstrate any understanding of the topic and does not fulfill the requirement to provide the form of the coefficients. Therefore, the student's response is entirely unhelpful and incorrect.",
+        "rating": "0"
+    },
+    {
+        "question": "What is the basis of the nullspace of A when A is a rank 2 matrix in the space of three by three matrices?",
+        "explanation": "The reference answer provides a specific vector, [1, 1, 1]^T, as the basis for the nullspace of a rank 2 matrix in 3x3 space. The student's answer correctly identifies that the nullspace is 1-dimensional and that it consists of vectors satisfying A\u00b7x = 0, but it fails to provide a specific basis vector. The student's answer is correct in concept but incomplete as it does not specify the actual basis vector, which is essential for a complete answer.",
+        "rating": "5"
+    },
+    {
+        "question": "What is the determinant of BTB for a three by three matrix B with eigenvalues 0, 1, and 2?",
+        "explanation": "The reference answer states that the determinant of B\u1d57B is 0, which is correct because the determinant of a product of matrices is the product of their determinants. Since one of the eigenvalues of B is 0, the determinant of B is also 0, leading to the conclusion that the determinant of B\u1d57B is 0. The student's answer correctly states that the determinant of B\u1d57B is 0, which aligns with the reference answer.",
+        "rating": "10"
+    },
+    {
+        "question": "What is the rank of a three by three matrix B with eigenvalues 0, 1, and 2?",
+        "explanation": "The reference answer correctly states that the rank of the matrix B is 2, which is consistent with the eigenvalues provided. Since the eigenvalue 0 indicates a loss of rank, the rank is equal to the number of non-zero eigenvalues. In this case, there are two non-zero eigenvalues (1 and 2), leading to a rank of 2. The student's answer is correct and matches the reference answer.",
+        "rating": "10"
+    },
+    {
+        "question": "What are the eigenvalues of the matrix A with diagonal entries 1, 4, and 6?",
+        "explanation": "The candidate's answer correctly identifies the eigenvalues of the matrix A as 1, 4, and 6, which matches the reference answer. There are no mistakes or omissions in the candidate's response, and it is clear and concise.",
+        "rating": "10"
+    },
+    {
+        "question": "What are the eigenvalues of the matrix B where det(B - \u03bbI) = (\u03bb\u00b2 - 3)(2 - \u03bb)?",
+        "explanation": "The candidate's answer correctly identifies the eigenvalues as \u221a3, -\u221a3, and 2, which matches the reference answer. There are no mistakes or omissions in the candidate's response. The answer is complete and accurate.",
+        "rating": "10"
+    },
+    {
+        "question": "What are the eigenvalues of the matrix C where det(C - \u03bbI) = \u03bb\u00b2(\u03bb - 6)?",
+        "explanation": "The candidate's answer correctly identifies the eigenvalues as 0 and 6, and it also notes the multiplicity of the eigenvalue 0. However, the reference answer simply lists the eigenvalues without mentioning multiplicity. The candidate's answer is more informative and accurate in terms of the multiplicity of the eigenvalues. Therefore, while the reference answer is correct, the candidate's answer provides additional helpful detail.",
+        "rating": "9"
+    },
+    {
+        "question": "14. What multiple of the first equation should be subtracted from the second equation in the system 2x + 3y = 5 and 6x + 15y = 12 when using elimination?",
+        "explanation": "The reference answer correctly states that the multiple is '3'. The student's answer also correctly identifies that '3 times the first equation' should be subtracted from the second equation to eliminate x. However, the student could have been more concise by simply stating the multiple without the additional explanation, as the question specifically asks for the multiple. Nonetheless, the student's answer is correct and helpful.",
+        "rating": "9"
+    },
+    {
+        "question": "What are the pivots when applying elimination to the matrix A derived from the system 2x + 3y = 5 and 6x + 15y = 12?",
+        "explanation": "The candidate's answer correctly identifies the pivots as 2 and 6, which matches the reference answer. However, the phrasing 'The pivots are 2 and 6' is slightly less concise than simply stating '2 and 6'. Nonetheless, the answer is correct and helpful.",
+        "rating": "9"
+    },
+    {
+        "question": "What is the form of the upper triangular matrix U after elimination for the system 2x + 3y = 5 and 6x + 15y = 12?",
+        "explanation": "The candidate's answer correctly identifies the upper triangular matrix U as [[2, 3], [0, 6]], which matches the reference answer format. However, the reference answer uses a different notation with semicolons, while the candidate uses a more common programming notation with commas. Both answers convey the same information, but the candidate's answer is more explicit in its matrix representation. There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "What is the solution for y after back substitution in the system 2x + 3y = 5 and 6x + 15y = 12?",
+        "explanation": "The reference answer provides the solution for y as '-1/2', while the student's answer states 'y = -1/2'. The student's answer is correct in terms of the value of y, but it includes the variable 'y' in the response, which is not necessary since the reference answer only provides the numerical value. However, the inclusion of 'y =' does not detract from the correctness of the answer. Therefore, the student's answer is correct but slightly more verbose than the reference answer.",
+        "rating": "9"
+    },
+    {
+        "question": "What matrix reduces Pascal's matrix to a smaller Pascal matrix?",
+        "explanation": "The candidate's answer does not provide any information or attempt to answer the question. The reference answer specifies a particular matrix that reduces Pascal's matrix to a smaller version, which is crucial information that the candidate failed to provide. Therefore, the candidate's response lacks correctness and helpfulness.",
+        "rating": "0"
+    },
+    {
+        "question": "What is the form of X when AX = 0 for a rank 2 matrix A in the space of three by three matrices?",
+        "explanation": "The reference answer provides a specific form of X as a matrix with identical rows, which is a valid representation of the solution to the equation AX = 0 for a rank 2 matrix A. The student's answer correctly identifies that X is in the nullspace of A and describes it in terms of a basis vector and a scalar, which is a general representation. However, it does not directly provide the specific form of X as requested in the question. While the student's answer is correct in a broader sense, it lacks the specificity that the question asks for, which is crucial for a complete answer.",
+        "rating": "3"
+    },
+    {
+        "question": "What is the form of matrices that have the form AX for some matrix X in the space of three by three matrices?",
+        "explanation": "The reference answer specifies that the columns of the resulting matrix AX individually sum to 0, which is a crucial characteristic of such matrices. The student's answer correctly identifies that the rank is at most 2 and that the columns are linear combinations of the columns of A, which are relevant points. However, it fails to mention the specific condition regarding the columns summing to 0, which is a key aspect of the reference answer. Thus, while the student's answer contains valid information, it does not fully address the question as posed by the reference answer.",
+        "rating": "4"
+    },
+    {
+        "question": "What are the dimensions of the nullspace and column space of AX in the space of three by three matrices?",
+        "explanation": "The reference answer states that the nullspace has a dimension of 3 and the column space has a dimension of 6. The student's answer incorrectly states that the nullspace is 1-dimensional and the column space is 2-dimensional. This indicates a misunderstanding of the properties of the nullspace and column space in the context of 3x3 matrices. The correct dimensions should reflect the rank-nullity theorem and the specific characteristics of the matrix involved.",
+        "rating": "1"
+    },
+    {
+        "question": "What is the determinant of BTB for a three by three matrix B with eigenvalues 0, 1, and 2?",
+        "explanation": "The reference answer states that the determinant of B\u1d57B is 0, which is correct. The candidate's answer also correctly states that the determinant of B\u1d57B is 0. Both answers are consistent and accurate, as the determinant of B\u1d57B is the product of the eigenvalues of B, which includes 0, leading to a determinant of 0. There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "What are the eigenvalues of the matrix A = [[4, 0], [1, 2]]?",
+        "explanation": "The candidate's answer correctly identifies the eigenvalues of the matrix A as 4 and 2, which matches the reference answer. The phrasing is slightly different, but the content is accurate and complete.",
+        "rating": "10"
+    },
+    {
+        "question": "What is the eigenvalue associated with a Markov matrix where the sum of the columns is 1?",
+        "explanation": "The candidate's answer correctly identifies that the eigenvalue associated with a Markov matrix, where the sum of the columns is 1, is \u03bb = 1. This aligns with the reference answer, which simply states '1'. The candidate's response is accurate and provides additional clarity by explicitly stating the eigenvalue in the form of an equation. There are no mistakes or omissions in the candidate's answer.",
+        "rating": "10"
+    },
+    {
+        "question": "What is the determinant of A - I for a matrix A where each row sums to 1?",
+        "explanation": "The candidate's answer correctly states that the determinant of A - I is 0, which aligns with the reference answer. The explanation is clear and accurate, providing the same conclusion as the reference answer without any mistakes or omissions.",
+        "rating": "10"
+    },
+    {
+        "question": "What are the eigenvalues of a matrix C with a characteristic equation det(C - \u03bbI) = \u03bb\u00b2(\u03bb - 6)?",
+        "explanation": "The reference answer correctly identifies the eigenvalues as 6, 0, 0, indicating that 0 is an eigenvalue with a multiplicity of 2. The student's answer also correctly states the eigenvalues as 0 (with multiplicity 2) and 6, but it does not explicitly mention the multiplicity of the eigenvalue 6. However, the essential information is conveyed correctly. Therefore, while the student's answer is accurate, it could be slightly improved by explicitly stating the multiplicity of 6 as 1.",
+        "rating": "8"
+    },
+    {
+        "question": "27. Verify that the Haar wavelet basis vectors are orthogonal. What operation is used to ensure they are orthonormal?",
+        "explanation": "The candidate's answer correctly states that to ensure the Haar wavelet basis vectors are orthonormal, one must divide each vector by its length. This aligns with the reference answer, which also emphasizes the operation of dividing by the lengths of the vectors. There are no mistakes or omissions in the candidate's response, and it accurately conveys the necessary information.",
+        "rating": "10"
+    },
+    {
+        "question": "28. Describe a basis for the set of all 2\u00d72 matrices with real entries.",
+        "explanation": "The candidate's answer correctly identifies the basis matrices for the set of all 2\u00d72 matrices with real entries. The matrices listed are the same as those in the reference answer, and the candidate's phrasing is slightly different but does not change the correctness of the content. Both answers provide the same basis matrices, so there are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "What is the rank of the matrix A = [[1, 5, 7, 9], [0, 4, 1, 7], [2, -2, 11, -3]]?",
+        "explanation": "The reference answer states that the rank of the matrix A is 2, which is correct. The student's answer also correctly states that the rank of matrix A is 2, providing a complete and accurate response. There are no mistakes or omissions in the student's answer.",
+        "rating": "10"
+    },
+    {
+        "question": "What are the special solutions to the equation Ax = 0 for the matrix A = [[1, 5, 7, 9], [0, 4, 1, 7], [2, -2, 11, -3]]?",
+        "explanation": "The candidate's answer correctly identifies the special solutions but presents them in a slightly incorrect format. The reference answer lists the solutions as a single array containing two vectors, while the candidate separates them into two arrays. This could lead to confusion regarding the format of the answer. However, the solutions themselves are correct and match the reference answer.",
+        "rating": "8"
+    },
+    {
+        "question": "If S and T are two subspaces of a vector space V, what is the span of S \u222a T?",
+        "explanation": "The candidate's answer correctly identifies that the span of S \u222a T is S + T, which is the set of all sums of vectors from S and T. This aligns with the reference answer and provides additional clarity by explaining what S + T represents. There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "What is the general form of a 4\u00d74 symmetric matrix, and how many entries can be chosen independently?",
+        "explanation": "The candidate's answer correctly states that a 4\u00d74 symmetric matrix has 10 independent entries that can be chosen freely. This aligns with the reference answer, which simply states '10'. However, the candidate's answer provides additional context by mentioning the nature of the matrix, which is helpful. There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "How many independent entries can be chosen for a 4\u00d74 skew-symmetric matrix?",
+        "explanation": "The candidate's answer correctly states that there are 6 independent entries in a 4\u00d74 skew-symmetric matrix, which aligns with the reference answer. The candidate's response is clear and accurate, providing the correct number of independent entries without any mistakes or omissions.",
+        "rating": "10"
+    },
+    {
+        "question": "If C = AB, how is the nullspace of C related to the nullspaces of A and B?",
+        "explanation": "The candidate's answer is correct and matches the reference answer exactly. It accurately states that the nullspace of C is the intersection of the nullspaces of A and B, using the notation N(C) = N(A) \u2229 N(B). There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "What matrix E transforms A into an upper triangular form U for A = [[1, 3, 0], [2, 4, 0], [2, 0, 1]]?",
+        "explanation": "The candidate's answer correctly identifies the matrix E as [[1, 0, 0], [-2, 1, 0], [-2, 3, 1]], which matches the reference answer. There are no mistakes or omissions in the response, and it is presented clearly. Therefore, the response is accurate and helpful.",
+        "rating": "10"
+    },
+    {
+        "question": "What is the row reduced form of the matrix A = [[1, 5, 7, 9], [0, 4, 1, 7], [2, -2, 11, -3]]?",
+        "explanation": "The candidate's answer is identical to the reference answer, providing the correct row-reduced form of the matrix. There are no mistakes or omissions in the response.",
+        "rating": "10"
+    },
+    {
+        "question": "If A is a Markov matrix with eigenvalues \u03bb1 = 1 and \u03bb2 = -0.3, what is the steady-state vector as k \u2192 \u221e?",
+        "explanation": "The reference answer provides a specific steady-state vector, while the student's answer correctly states that the steady-state vector is proportional to [9, 4]. This indicates an understanding of the concept, but it does not provide the exact vector as requested. While the student's answer is valid, it lacks the specificity of the reference answer. However, the rubric does not require the exact vector to be provided, only that the steady-state vector is identified. Since the student's answer correctly identifies the steady-state vector as proportional to [9, 4], it should receive a higher score than initially assessed.",
+        "rating": "9"
+    },
+    {
+        "question": "What are the eigenvalues of A = [[6, 9], [4, 1]] and the corresponding eigenvectors?",
+        "explanation": "The candidate's answer correctly identifies the eigenvalues as 1 and -0.3, which matches the reference answer. However, the format of the eigenvectors is slightly different; the reference answer presents them as a 2D array, while the candidate presents them as separate vectors. Despite this difference in format, the content is accurate. Therefore, the candidate's response is correct and helpful, but the presentation could be improved to match the reference format more closely.",
+        "rating": "9"
+    },
+    {
+        "question": "Describe the general form of vectors on the plane x - 3y - z = 12.",
+        "explanation": "The candidate's answer correctly identifies the general form of vectors on the specified plane, but it presents the equation in a slightly different format. The reference answer uses a double bracket notation, while the candidate uses a single bracket notation. However, the essential information is conveyed correctly in both answers. The candidate's answer is clear and accurate, but the notation could be more aligned with the reference answer for consistency.",
+        "rating": "8"
+    },
+    {
+        "question": "What is the determinant of a permutation matrix P with P\u00b3 = I but P \u2260 I?",
+        "explanation": "The reference answer states that the determinant of the permutation matrix P is 1, which is correct. The student's answer also correctly states that the determinant of P is 1. Both answers are consistent and accurate, as permutation matrices have determinants of either 1 or -1, and since P\u00b3 = I, it indicates that P is an even permutation, thus having a determinant of 1. There are no mistakes or omissions in the student's response.",
+        "rating": "10"
+    },
+    {
+        "question": "How many pivots are required for a 4\u00d74 matrix A to satisfy A = LU with four pivots?",
+        "explanation": "The candidate's answer correctly states that four pivots are required for a 4x4 matrix A to satisfy A = LU with full rank. However, the reference answer is more concise by simply stating '4'. The candidate's answer is accurate but slightly more verbose than necessary. Overall, the response is correct and helpful.",
+        "rating": "8"
+    },
+    {
+        "question": "What are the independent variables when solving Ax = 0 for A = [[1, 5, 7, 9], [0, 4, 1, 7], [2, -2, 11, -3]]?",
+        "explanation": "The candidate's answer correctly identifies the independent variables as x3 and x4, which matches the reference answer. There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    },
+    {
+        "question": "How is the nullspace of a product C = AB related to the nullspaces of A and B?",
+        "explanation": "The candidate's answer is correct and accurately reflects the reference answer. It states that the nullspace of C is the intersection of the nullspaces of A and B, which is exactly what the reference answer conveys. There are no mistakes or omissions in the candidate's response.",
+        "rating": "10"
+    }
+]

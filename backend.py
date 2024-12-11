@@ -120,10 +120,10 @@ def upload_assignment_pdf():
         questions = [[line.strip()] for line in content.split('\n') if line.strip()]
         
         return questions
-    file_path = 'eval_pdfs/questions.txt'  # Replace with your file path
+    file_path = 'eval_pdfs/l_a_questions.txt'  # Replace with your file path
     questions = parse_questions(file_path)
     result = len(questions)
-    num=43
+    num=len(questions)
     logging.debug(f"Received Data: {questions}") 
     if isinstance(result, int):
         return jsonify({"message": f"{result} new documents added."}), 200
@@ -158,7 +158,7 @@ def upload_rubric():
         questions = [[[line.strip()]] for line in content.split('\n') if line.strip()]
         
         return questions
-    file_path = 'eval_pdfs/ref_rubric.txt'  # Replace with your file path
+    file_path = 'eval_pdfs/l_a_ref_rubric.txt'  # Replace with your file path
     rubrics = parse_questions(file_path)
     result = len(rubrics)
     logging.debug(f"Received Rubric: {rubrics}") 
@@ -180,7 +180,7 @@ def upload_answer_pdf():
         questions = [[line.strip()] for line in content.split('\n') if line.strip()]
         
         return questions
-    file_path = 'eval_pdfs/o1_student_ans.txt'  # Replace with your file path
+    file_path = 'eval_pdfs/l_a_o1_student_ans.txt'  # Replace with your file path
     answers = parse_questions(file_path)
     result = len(answers)
     logging.debug(f"Received Answers: {answers}") 
@@ -204,9 +204,9 @@ def upload_pdf():
         questions = [line.strip() for line in content.split('\n') if line.strip()]
         
         return questions
-    file_path = 'eval_pdfs/questions.txt'  # Replace with your file path
-    questions_list = parse_questions(file_path)
-    result = len(questions_list)
+    file_path = 'eval_pdfs/l_a_context.txt'  # Replace with your file path
+    context = parse_questions(file_path)
+    result = len(context)
     if isinstance(result, int):
         return jsonify({"message": f"{result} new documents added."}), 200
     else:
