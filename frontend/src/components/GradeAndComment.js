@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Button, Typography, Box } from '@mui/material';
 
 function GradeAndComment() {
   const [result, setResult] = useState([]);
@@ -21,19 +22,21 @@ function GradeAndComment() {
   };
 
   return (
-    <div>
-      <h2>Grade and Comment</h2>
-      <button onClick={handleSubmit}>Grade and Comment</button>
-      <div>
-        <h3>Results:</h3>
+    <Box>
+      
+      <Button variant="contained" color="secondary" onClick={handleSubmit}>
+        Grade and Comment
+      </Button>
+      <Box mt={2}>
+        <Typography variant="h6">Results:</Typography>
         {result.map((res, index) => (
-          <div key={index}>
-            <p>Question: {res}</p>
-          </div>
+          <Box key={index} mb={1}>
+            <Typography>Question: {res}</Typography>
+          </Box>
         ))}
-        {grade !== null && <p>Grade: {grade}</p>} {/* Display grade if available */}
-      </div>
-    </div>
+        {grade !== null && <Typography>Grade: {grade}</Typography>}
+      </Box>
+    </Box>
   );
 }
 
