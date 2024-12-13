@@ -529,14 +529,14 @@ def grade_assignment_route():
         llm,
         system_message="You should grade the student answers based on the rubric to the best of your ability. Do not go against the rubric information and assume anything on your own. Do not assume typos, go with what is given to you. Treat each rubric item as a condition, and negative points should be rewarded if the condition is satisfied. Do not take semantics of the rubric into account. Rubric is the truth. Scores can only be 0 or the points shown in the rubric item. ",
     )
-    grader_node = functools.partial(agent_node, agent=grader_agent, name="Grader", questions=qra)
+    grader_node = functools.partial(agent_node, agent=grader_agent, name="Grader", l=qra)
 
     # Reviewer agent and node
     review_agent = create_reviewer_agent(
         llm,
         system_message="You should make sure the grader follows the rubric primarily. Do not go against the rubric information and assume anything on your own. If the answer satisfies the rubric, do not give a reason to not give the point. Only follow the current rubric item. Other rubric items should not affect your judgement.Do not assume typos, go with what is given to you. If the points are rewarded, do not mention anything in the explanation, except the fact that it satisfied whatever is on the rubric. For negative rubric points, treat it as a binary option between 0 and the negative value, so if the rubric condition is true, then give it the negative points, else if the rubric requirement is not satisfied, give it 0 if there are negative points. If the points rewarded align, then make sure to start with 'FINAL POINTS:', else start with 'WRONG POINTS:' 'WRONG POINTS:' is given only if the score given by you is not the same as the score given by the grader, do not misuse it."
     )
-    reviewer_node = functools.partial(agent_node, agent=review_agent, name="Reviewer", questions=qra)
+    reviewer_node = functools.partial(agent_node, agent=review_agent, name="Reviewer", l=qra)
 
     def router(state):
         """
