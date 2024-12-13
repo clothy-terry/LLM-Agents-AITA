@@ -442,11 +442,11 @@ def grade_assignment_route():
         return {"score": total_score, "lines": lines, "sender": name, "messages": []}
 
     # Helper function to create a node for both grader and reviewer agents
-    def agent_node(state, agent, name, questions):
+    def agent_node(state, agent, name, l):
         messages = state["messages"]
         q_a_pairs = ""
         answers = []
-        for i, question in enumerate(questions):
+        for i, question in enumerate(l):
             answers.append([])
             for j, subquestion in enumerate(question):
                 answers[-1].append([])
@@ -460,14 +460,14 @@ def grade_assignment_route():
                             # get the last grade and review 
                             if ensemble_retriever:
                                 current_state = {
-                                        "messages": [HumanMessage(content=string)] + [messages[-len(questions)+i][j][k]],
+                                        "messages": [HumanMessage(content=string)] + [messages[-len(l)+i][j][k]],
                                         "sender": name,
                                         "q_a_pairs": q_a_pairs,
-                                        "context": ensemble_retriever.invoke(q)
+                                        "context": ensemble_retriever.invoke(questions[i][j])
                                 }
                             else:
                                 current_state = {
-                                    "messages": [HumanMessage(content=string)] + [messages[-len(questions)+i][j][k]],
+                                    "messages": [HumanMessage(content=string)] + [messages[-len(l)+i][j][k]],
                                     "sender": name,
                                     "q_a_pairs": q_a_pairs,
                                 }
@@ -475,14 +475,14 @@ def grade_assignment_route():
                         else:
                             if ensemble_retriever: 
                                 current_state = {
-                                        "messages": [HumanMessage(content=string)] + [messages[-len(questions)+i][j][k]],
+                                        "messages": [HumanMessage(content=string)] + [messages[-len(l)+i][j][k]],
                                         "sender": name,
                                         "q_a_pairs": q_a_pairs,
-                                        "context": ensemble_retriever.invoke(q)
+                                        "context": ensemble_retriever.invoke(questions[i][j])
                                 }
                             else:
                                 current_state = {
-                                    "messages": [HumanMessage(content=string)] + [messages[-len(questions)+i][j][k]],
+                                    "messages": [HumanMessage(content=string)] + [messages[-len(l)+i][j][k]],
                                     "sender": name,
                                     "q_a_pairs": q_a_pairs,
                                 }
@@ -492,7 +492,7 @@ def grade_assignment_route():
                                 "messages": [HumanMessage(content=string)],
                                 "sender": name,
                                 "q_a_pairs": q_a_pairs,
-                                "context": ensemble_retriever.invoke(q)
+                                "context": ensemble_retriever.invoke(questions[i][j])
                             }
                         else:
                             current_state = {
