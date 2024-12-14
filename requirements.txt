@@ -6,3 +6,4 @@ langchain-core
 langchain-community
 langgraph
 typing-extensions
+pypdf

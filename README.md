@@ -4,6 +4,15 @@ A system that uses LLM-powered agents to detect AI-generated content and grade a
 
 ## Project Structure
 
+### `frontend`
+The frontend of this project is built using React, Material-UI (MUI), and Axios to create a scalable and user-friendly interface.
+Key Features include:
+- Upload Course Material: Allows users to upload various course-related documents, implemented in the UploadCourseMaterial component.
+- Upload Assignment: Allows users to upload assignments, enabling the system to process and prepare them for grading, handled by the UploadAssignment component.
+- Upload Rubric: Users can upload grading rubrics, which the AI uses to evaluate student submissions, managed by the UploadRubric component.
+- Upload Answers: Allows users to upload student answers for automated grading, implemented in the UploadAnswers component.
+- Grade and Comment: Once all necessary documents are uploaded, this feature allows the AI to grade the assignments and provide feedback.
+
 ### `backend.py`
 Flask backend application that provides REST API endpoints for:
 - PDF assignment upload and conversion
