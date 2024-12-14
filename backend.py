@@ -63,10 +63,17 @@ class AgentState(TypedDict):
 def add_web_content():
     """Add new web content to the Retriever and update splits."""
     global documents, splits, ensemble_retriever
-    data = request.json
-    web_paths = data.get('web_paths')  # Extract 'web_paths' from JSON
-    if not web_paths or not isinstance(web_paths, list):
-        return jsonify({"error": "Invalid or missing 'web_paths'. Provide a list of URLs."}), 400
+    try:
+        # Get the text data from the request
+        data = request.json  # The data is sent as JSON
+        material = data.get('material', '')  # Extract the material (URLs) from the request
+        urls = re.split(r'[\n,;]+', material)
+        web_paths = [url.strip() for url in urls if url.strip()] 
+        # For demonstration, you can print or process the URLs here
+        print(f"Received URLs: {urls}")
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             chunk_size=300,
             chunk_overlap=50)
@@ -81,20 +88,17 @@ def add_web_content():
         new_docs = loader.load()
         # Add to the document list
         documents.extend(new_docs)
-        
         # Split documents and add splits to the splits list
         doc_splits = text_splitter.split_documents(new_docs)
         splits.extend(doc_splits)
         result = len(doc_splits)
         faiss_index = FAISS.from_documents(splits, embedding=OpenAIEmbeddings())
         faiss_retriever = faiss_index.as_retriever()
-
         bm25_retriever = BM25Retriever.from_documents(splits)
-
         ensemble_retriever = EnsembleRetriever(retrievers=[bm25_retriever, faiss_retriever],
                                     weights=[0.4, 0.6])
     except Exception as e:
-        return f"Error loading documents: {str(e)}"
+        return jsonify({"error": f"Error loading documents: {str(e)}"}), 500
 
     if isinstance(result, int):
         return jsonify({"message": f"{result} new documents added."}), 200
@@ -307,7 +311,7 @@ def upload_pdf():
         ensemble_retriever = EnsembleRetriever(retrievers=[bm25_retriever, faiss_retriever],
                                     weights=[0.4, 0.6])
     except Exception as e:
-        return f"Error loading documents: {str(e)}"
+        return jsonify({"error": f"Error loading documents: {str(e)}"}), 500
 
     if isinstance(result, int):
         return jsonify({"message": f"{result} new documents added."}), 200
