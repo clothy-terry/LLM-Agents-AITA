@@ -644,15 +644,15 @@ def grade_assignment_route():
 
             return "continue"
     workflow = StateGraph(AgentState)
-    # workflow.add_node("Detector", detector_node)
+    workflow.add_node("Detector", detector_node)
     workflow.add_node("Grader", grader_node)
     workflow.add_node("Reviewer", reviewer_node)
 
-    # workflow.add_conditional_edges(
-    #     "Detector",
-    #     router,
-    #     {"continue": "Grader", END: END},
-    # )
+    workflow.add_conditional_edges(
+        "Detector",
+        router,
+        {"continue": "Grader", END: END},
+    )
 
     workflow.add_conditional_edges(
         "Grader",
@@ -666,8 +666,8 @@ def grade_assignment_route():
         {"continue": "Grader", END: END},
     )
 
-    # workflow.add_edge(START, "Detector")
-    workflow.add_edge(START, "Grader")
+    workflow.add_edge(START, "Detector")
+    # workflow.add_edge(START, "Grader")
     graph = workflow.compile()
     events = graph.stream(
         {
