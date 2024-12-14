@@ -15,31 +15,16 @@ Key Features include:
 
 ### `backend.py`
 Flask backend application that provides REST API endpoints for:
-- PDF assignment upload and conversion
-- AI-generated content detection
-- Assignment grading with multi-layer verification
-- Course content retrieval for RAG (Retrieval-Augmented Generation)
-- Reference generation(TODO)
-- Math analysis(TODO)
-- More...
-*Note: Try to keep the backend as simple as possible, and move as much logic as possible to the utils.py file.*
+- AI-generated content detection: LLM agent that aims to detect AI-generated content in student answers
+- Assignment grading with multi-layer verification: 2 LLM agents conversing with each other to determine best grade to give
+- Course content retrieval for RAG (Retrieval-Augmented Generation): Weighted sum of two retrievers to get best documents related to questions
+    - PDF assignment upload and conversion:  Upload pdf and update retriever
+    - Web path upload and conversion: Upload web path and update retriever
 
 ### `rag.ipynb`
 Jupyter notebook containing the implementation of:
 - LLM-powered multi agent system
 - RAG (Retrieval-Augmented Generation) functionality
-
-### `utils.py`
-Utility functions for the backend operations:
-- PDF text and image extraction
-- AI-generated content detection
-- Assignment grading logic
-- Multi-layer response verification
-- Content retrieval for RAG
-
-### `test.py`
-Test suite for the application (Currently empty, to be implemented):
-- Unit tests for utility functions
 
 ## Evaluation
 We plan to create an evaluation dataset with human involvement. The goal is to manually curate a high-quality dataset for various subjects, containing well-crafted QA pairs.
@@ -56,7 +41,7 @@ Depending on the subject matter, we may adopt two different approaches:
 - To make the curation process more efficient and scalable, we intend to explore tools like [Argilla](https://github.com/argilla-io/argilla).
 
 ### For Reasoning-Oriented Subjects (e.g., Math) 
-- For subjects like math where answers are stronly defined, we can use existing question bank datasets
+- For subjects like math where answers are strongly defined, we can use existing question bank datasets
 - We need to be careful when using existing datasets, as they may have been used in the model training set
 - Datasets like Deepmind's mathematics and MathQA support question generation, so that we're testing on completely new questions (https://github.com/google-deepmind/mathematics_dataset, https://math-qa.github.io/)
 - These datasets support questions on various different subfields of mathematics and various levels of difficulty
