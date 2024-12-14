@@ -13,7 +13,7 @@ import InfoIcon from "@mui/icons-material/Info";
 function AnswerQuestions() {
   // State to store the user's input
   const [textInput, setTextInput] = useState("");
-  // State to store the response string from the server
+  // State to store the response from the server
   const [serverResponse, setServerResponse] = useState("");
 
   // Function to handle form submission
@@ -25,7 +25,7 @@ function AnswerQuestions() {
       const response = await axios.post("http://localhost:5000/answer_questions", {
         material: textInput, // Pass the input as the 'material' field in the request body
       });
-      // Set the server response in the state (response.data.answer)
+      // Set the server response in the state
       setServerResponse(response.data.answer || "No response from server");
     } catch (error) {
       // Handle errors and display an alert with a relevant message
@@ -93,11 +93,21 @@ function AnswerQuestions() {
         </Box>
       </Box>
 
-      {/* Display the server response (string) */}
+      {/* Display the server response */}
       {serverResponse && (
         <Box mt={2}>
           <Typography variant="h6">Server Response:</Typography>
-          <Typography variant="body1">{serverResponse}</Typography>
+          {Array.isArray(serverResponse) ? (
+            // Render each item in the list
+            serverResponse.map((item, index) => (
+              <Typography key={index} variant="body1">
+                {item}
+              </Typography>
+            ))
+          ) : (
+            // Render the string response
+            <Typography variant="body1">{serverResponse}</Typography>
+          )}
         </Box>
       )}
     </form>

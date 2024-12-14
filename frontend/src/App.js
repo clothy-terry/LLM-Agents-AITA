@@ -74,6 +74,13 @@ function AnswerQuestionsPage() {
         <Box mb={2}>
           <AnswerQuestions />
         </Box>
+        <Box mt={4} display="flex" justifyContent="center">
+          <Link to="/">
+            <Button variant="contained" color="primary">
+              Back to Main Page
+            </Button>
+          </Link>
+        </Box>
       </Container>
     </Box>
   );

@@ -5,7 +5,7 @@ import bs4
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
-
+from langchain.prompts import PromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import Chroma, FAISS
 from langchain_community.vectorstores import FAISS
@@ -79,7 +79,24 @@ def answer_questions():
     data = request.json  # The data is sent as JSON
     question = data.get('material', '')
     sub_questions = generate_queries_decomposition.invoke({"question":question})
+    
+    retrieval_grader_prompt = PromptTemplate(
+        template="""You are a grader assessing relevance
+        of a retrieved document to a user question. If the document contains keywords related to the user question,
+        grade it as relevant. It does not need to be a stringent test. The goal is to filter out erroneous retrievals.
 
+        Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question.
+        Provide the binary score as a JSON with a single key 'score' and no premable or explaination.
+
+        Here is the retrieved document:
+        {document}
+
+        Here is the user question:
+        {question}
+        """,
+        input_variables=["question", "document"],
+        )
+    retrieval_grader = retrieval_grader_prompt | llm | JsonOutputParser()
     # Initialize a list to hold RAG chain results
     rag_results = []
     if not ensemble_retriever:
@@ -96,7 +113,7 @@ def answer_questions():
         # Retrieve documents for each sub-question
         retrieved_docs = ensemble_retriever.get_relevant_documents(sub_question)
         for d in retrieved_docs:
-          score = ensemble_retriever.invoke(
+          score = retrieval_grader.invoke(
               {"question": question, "document": d.page_content}
           )
           grade = score["score"]
@@ -117,7 +134,7 @@ def answer_questions():
         answer = (prompt_rag | llm | StrOutputParser()).invoke({"context": filtered_docs,
                                                                 "question": sub_question})
         rag_results.append(answer)
-        result = ["sub-question: " + question + ", answer: " + answer for question, answer in zip(sub_questions, rag_results)]
+        result = ["Subquestion: " + question + " | Answer: " + answer for question, answer in zip(sub_questions, rag_results)]
     return jsonify({"answer": result}), 200
     
 @app.route('/add-web-content', methods=['POST'])
