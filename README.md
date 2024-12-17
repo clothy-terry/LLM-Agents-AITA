@@ -33,6 +33,8 @@ Flask backend application that provides REST API endpoints for:
 - Course content retrieval for RAG (Retrieval-Augmented Generation): Weighted sum of two retrievers to get best documents related to questions
     - PDF assignment upload and conversion:  Upload pdf and update retriever
     - Web path upload and conversion: Upload web path and update retriever
+- Question-Answering tool using RAG
+    - Uses Retrieval Grader and Web search tool to help get context on how to answer the question
 
 ### `rag.ipynb`
 Jupyter notebook containing the implementation of:

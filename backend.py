@@ -1,12 +1,11 @@
 from flask import Flask, request, jsonify
 import os
 from config import Config
-import json
 import bs4
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
-
+from langchain.prompts import PromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import Chroma, FAISS
 from langchain_community.vectorstores import FAISS
@@ -15,7 +14,12 @@ from langchain.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import functools
-
+from langchain import hub
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
+from langchain.schema import Document
 from langchain_core.messages import AIMessage
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.messages import (
@@ -25,16 +29,12 @@ from langchain_core.messages import (
 )
 import re
 from typing import Literal
-
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
 from langgraph.graph import END, StateGraph, START
 import operator
 from typing import Annotated, Sequence
 from typing_extensions import TypedDict
-
 from langchain_openai import ChatOpenAI
-
 from langchain_community.document_loaders import PyPDFLoader
 from flask_cors import CORS
 
@@ -52,6 +52,8 @@ answers = None
 num = 0
 qra = None
 import logging
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain import hub
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -59,6 +61,82 @@ class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], operator.add]
     sender: str
 
+@app.route('/answer_questions', methods=['POST'])
+def answer_questions():
+    """Add new web content to the Retriever and update splits."""
+    global ensemble_retriever
+    web_search_tool = TavilySearchResults(k=3)
+    subquestion_template = """You are a helpful assistant that generates multiple sub-questions related to an input question. \n
+    The goal is to break down the input into a set of sub-problems / sub-questions that can be answers in isolation. \n
+    Generate multiple search queries related to: {question} \n
+    Output (3 queries):"""
+    prompt_decomposition = ChatPromptTemplate.from_template(subquestion_template)
+    prompt_rag = hub.pull("rlm/rag-prompt")
+    # LLM
+    llm = ChatOpenAI(temperature=0)
+    # Chain
+    generate_queries_decomposition = ( prompt_decomposition | llm | StrOutputParser() | (lambda x: x.split("\n")))
+    data = request.json  # The data is sent as JSON
+    question = data.get('material', '')
+    sub_questions = generate_queries_decomposition.invoke({"question":question})
+    
+    retrieval_grader_prompt = PromptTemplate(
+        template="""You are a grader assessing relevance
+        of a retrieved document to a user question. If the document contains keywords related to the user question,
+        grade it as relevant. It does not need to be a stringent test. The goal is to filter out erroneous retrievals.
+
+        Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question.
+        Provide the binary score as a JSON with a single key 'score' and no premable or explaination.
+
+        Here is the retrieved document:
+        {document}
+
+        Here is the user question:
+        {question}
+        """,
+        input_variables=["question", "document"],
+        )
+    retrieval_grader = retrieval_grader_prompt | llm | JsonOutputParser()
+    # Initialize a list to hold RAG chain results
+    rag_results = []
+    if not ensemble_retriever:
+        answer_question_template = """You are a helpful assistant that generates answers to an input question. \n
+        The goal is to answer the question correctly and truthfully. If you do not know the answer confidently, say that you don't know the answer. \n
+        Generate answer to: {question} \n
+        Output (1 answer):"""
+        generate_answers = ChatPromptTemplate.from_template(answer_question_template)
+        generate_answers_to_question = ( generate_answers | llm | StrOutputParser() )
+        answer = generate_answers_to_question.invoke({"question":question})
+        return jsonify({"answer": answer}), 200
+    for sub_question in sub_questions:
+        filtered_docs = []
+        # Retrieve documents for each sub-question
+        retrieved_docs = ensemble_retriever.get_relevant_documents(sub_question)
+        for d in retrieved_docs:
+          score = retrieval_grader.invoke(
+              {"question": question, "document": d.page_content}
+          )
+          grade = score["score"]
+          if grade.lower() == "yes":
+              # print("RELEVANT DOC")
+              filtered_docs.append(d)
+          else:
+              # print("NOT RELEVANT")
+              web_search = "Yes"
+              continue
+        if web_search == "Yes":
+          docs = web_search_tool.invoke({"query": question})
+          web_results = "\n".join([d["content"] for d in docs])
+          web_results = Document(page_content=web_results)
+          filtered_docs.append(web_results)
+
+        # Use retrieved documents and sub-question in RAG chain
+        answer = (prompt_rag | llm | StrOutputParser()).invoke({"context": filtered_docs,
+                                                                "question": sub_question})
+        rag_results.append(answer)
+        result = ["Subquestion: " + question + " | Answer: " + answer for question, answer in zip(sub_questions, rag_results)]
+    return jsonify({"answer": result}), 200
+    
 @app.route('/add-web-content', methods=['POST'])
 def add_web_content():
     """Add new web content to the Retriever and update splits."""
@@ -566,15 +644,15 @@ def grade_assignment_route():
 
             return "continue"
     workflow = StateGraph(AgentState)
-    # workflow.add_node("Detector", detector_node)
+    workflow.add_node("Detector", detector_node)
     workflow.add_node("Grader", grader_node)
     workflow.add_node("Reviewer", reviewer_node)
 
-    # workflow.add_conditional_edges(
-    #     "Detector",
-    #     router,
-    #     {"continue": "Grader", END: END},
-    # )
+    workflow.add_conditional_edges(
+        "Detector",
+        router,
+        {"continue": "Grader", END: END},
+    )
 
     workflow.add_conditional_edges(
         "Grader",
@@ -588,8 +666,8 @@ def grade_assignment_route():
         {"continue": "Grader", END: END},
     )
 
-    # workflow.add_edge(START, "Detector")
-    workflow.add_edge(START, "Grader")
+    workflow.add_edge(START, "Detector")
+    # workflow.add_edge(START, "Grader")
     graph = workflow.compile()
     events = graph.stream(
         {
