@@ -9,7 +9,7 @@ function GradeAndComment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/grade_assignment', {
+      const response = await axios.post('http://localhost:5001/grade_assignment', {
         course_id: '123',  // Example course_id
         assignment_id: '456',  // Example assignment_id
       });

@@ -20,7 +20,7 @@ function UploadAssignment() {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('http://localhost:5000/upload_assignment', formData);
+      const response = await axios.post('http://localhost:5001/upload_assignment', formData);
       alert(response.data.message);
     } catch (error) {
       alert('Error uploading assignment: ' + error.response.data.error);

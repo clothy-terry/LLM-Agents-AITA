@@ -21,7 +21,7 @@ function UploadRubric() {
     formData.append('course_id', '123');  // Example course_id
 
     try {
-      const response = await axios.post('http://localhost:5000/upload_rubric', formData);
+      const response = await axios.post('http://localhost:5001/upload_rubric', formData);
       alert(response.data.message);
     } catch (error) {
       alert('Error uploading rubric: ' + error.response.data.error);

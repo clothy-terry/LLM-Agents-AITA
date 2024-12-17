@@ -20,7 +20,7 @@ function AddWebPath() {
 
     try {
       // Send the input data (textInput) to the server
-      const response = await axios.post("http://localhost:5000/add-web-content", {
+      const response = await axios.post("http://localhost:5001/add-web-content", {
         material: textInput, // Pass the input as the 'material' field in the request body
       });
       alert(response.data.message); // Alert the user with the server's response message

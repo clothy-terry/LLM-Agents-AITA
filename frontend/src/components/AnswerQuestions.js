@@ -22,7 +22,7 @@ function AnswerQuestions() {
 
     try {
       // Send the input data (textInput) to the server
-      const response = await axios.post("http://localhost:5000/answer_questions", {
+      const response = await axios.post("http://localhost:5001/answer_questions", {
         material: textInput, // Pass the input as the 'material' field in the request body
       });
       // Set the server response in the state
