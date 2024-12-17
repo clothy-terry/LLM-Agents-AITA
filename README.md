@@ -46,7 +46,7 @@ cd frontend
 npm start
 ```
 
-### Start the Backend
+### Start the Backend in Separate Terminal
 
 ```bash
 python backend.py
