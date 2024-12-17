@@ -2,6 +2,22 @@
 
 A system that uses LLM-powered agents to detect AI-generated content and grade assignments with multi-layer verification.
 
+Installation instructions:
+- In root directory
+    - 'pip install requirements.txt'
+- In frontend directory
+    - npm install  
+    - npm install @mui/material @emotion/react @emotion/styled   (Install the core React dependencies)
+    - npm install @mui/icons-material     (Install Material-UI core and icons)
+    - npm install axios    (Install Axios for HTTP requests)
+
+ Running instructions:
+ - To run the frontend:
+    - cd /frontend
+    - npm start
+- To run the backend:
+    - Run 'python backend.py'    
+ 
 ## Project Structure
 
 ### `frontend`
@@ -12,19 +28,6 @@ Key Features include:
 - Upload Rubric: Users can upload grading rubrics, which the AI uses to evaluate student submissions, managed by the UploadRubric component.
 - Upload Answers: Allows users to upload student answers for automated grading, implemented in the UploadAnswers component.
 - Grade and Comment: Once all necessary documents are uploaded, this feature allows the AI to grade the assignments and provide feedback.
-
-- To run the frontend:
-cd /frontend
-(Install the core React dependencies)
-npm install
-(Install Material-UI core and icons)
-npm install @mui/material @emotion/react @emotion/styled
-npm install @mui/icons-material
-(Install Axios for HTTP requests)
-npm install axios
-(Run the frontend)
-npm start
-
 
 ### `backend.py`
 Flask backend application that provides REST API endpoints for:
