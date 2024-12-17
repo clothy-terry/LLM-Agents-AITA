@@ -1,6 +1,5 @@
 .env
 __pycache__/
-uploads/
 venv/
 .DS_Store
 eval_pdfs/l_a_context.txt
