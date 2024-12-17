@@ -4,7 +4,7 @@ A system that uses LLM-powered agents to detect AI-generated content and grade a
 
 Installation instructions:
 - In root directory
-    - 'pip install requirements.txt'
+    - pip install requirements.txt
 - In frontend directory
     - npm install  
     - npm install @mui/material @emotion/react @emotion/styled   (Install the core React dependencies)
@@ -16,7 +16,7 @@ Installation instructions:
     - cd /frontend
     - npm start
 - To run the backend:
-    - Run 'python backend.py'    
+    - python backend.py   
  
 ## Project Structure
 
