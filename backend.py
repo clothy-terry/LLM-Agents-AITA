@@ -507,7 +507,7 @@ def grade_assignment_route():
         prompt = prompt.partial(system_message=system_message)
         return prompt | llm
     #Helper function to create a node for AI detector agent
-    def detector_node(state, agent, name, items):
+    def detecting_node(state, agent, name, items):
         total_score = 0.0
         i = 0
         lines = []
@@ -604,7 +604,7 @@ def grade_assignment_route():
         llm,
         system_message="You should determine whether there is AI-content in the student answers with a score from [0.0 - 100.0], which is the magnitude of AI-content generation. In the lines you output for the AI-generation, make sure those lines are actually in the student answer and no hallucination is there. If you don't think there is AI-generated content, do not add anything to the lines.",
     )
-    detector_node = functools.partial(detector_node, agent=detector_agent, name="Detector", items=qa)
+    detector_node = functools.partial(detecting_node, agent=detector_agent, name="Detector", items=qa)
 
     # Grader agent and node
     grader_agent = create_grader_agent(
