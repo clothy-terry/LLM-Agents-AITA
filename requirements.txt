@@ -7,3 +7,5 @@ langchain-community
 langgraph
 typing-extensions
 pypdf
+faiss-cpu
+rank_bm25
