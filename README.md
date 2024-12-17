@@ -56,8 +56,8 @@ python backend.py
 
 ## Demo Instructions
 
-1. Open the "Ask a Question" page.
-2. Upload the following files sequentially, **waiting for a success notification after each upload**:
+1. Open the "Ask a Question" page and ask a question.
+2. Go to main page and upload the following files sequentially, **waiting for a success notification after each upload**:
    - `demo_eval/context.pdf` (Course Material)
    - `demo_eval/assignment.pdf` (Assignment)
    - `demo_eval/rubric.pdf` (Rubric)
