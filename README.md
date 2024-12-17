@@ -13,6 +13,19 @@ Key Features include:
 - Upload Answers: Allows users to upload student answers for automated grading, implemented in the UploadAnswers component.
 - Grade and Comment: Once all necessary documents are uploaded, this feature allows the AI to grade the assignments and provide feedback.
 
+- To run the frontend:
+cd /frontend
+(Install the core React dependencies)
+npm install
+(Install Material-UI core and icons)
+npm install @mui/material @emotion/react @emotion/styled
+npm install @mui/icons-material
+(Install Axios for HTTP requests)
+npm install axios
+(Run the frontend)
+npm start
+
+
 ### `backend.py`
 Flask backend application that provides REST API endpoints for:
 - AI-generated content detection: LLM agent that aims to detect AI-generated content in student answers
