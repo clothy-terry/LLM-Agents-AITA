@@ -14,3 +14,5 @@ eval_pdfs/qa_context.txt
 eval_pdfs/qa_o1_student_ans.txt
 eval_pdfs/qa_questions.txt
 eval_pdfs/qa_ref_rubric.txt
+eval_pdfs/l_a_rating.txt
+eval_pdfs/physics_rating.txt

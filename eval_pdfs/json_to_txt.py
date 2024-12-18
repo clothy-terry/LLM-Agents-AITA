@@ -18,10 +18,13 @@ extract_field_to_txt('eval_dataset/linear_algebra_benchmark.json', 'eval_pdfs/l_
 extract_field_to_txt('eval_dataset/linear_algebra_benchmark.json', 'eval_pdfs/l_a_ref_rubric.txt', 'referenceAnswer')
 extract_field_to_txt('eval_dataset/linear_algebra_benchmark.json', 'eval_pdfs/l_a_context.txt', 'context')
 extract_field_to_txt('eval_dataset/linear_algebra_benchmark.json', 'eval_pdfs/l_a_o1_student_ans.txt', 'o1Answer')
+extract_field_to_txt('eval_dataset/linear_algebra_benchmark.json', 'eval_pdfs/l_a_rating.txt', 'rating')
+
 extract_field_to_txt('eval_dataset/physics_benchmark.json', 'eval_pdfs/physics_questions.txt', 'Question')
 extract_field_to_txt('eval_dataset/physics_benchmark.json', 'eval_pdfs/physics_ref_rubric.txt', 'ReferenceAnswer')
 extract_field_to_txt('eval_dataset/physics_benchmark.json', 'eval_pdfs/physics_context.txt', 'Context')
 extract_field_to_txt('eval_dataset/physics_benchmark.json', 'eval_pdfs/physics_o1_student_ans.txt', 'o1Answer')
+extract_field_to_txt('eval_dataset/physics_benchmark.json', 'eval_pdfs/physics_rating.txt', 'Rating')
 # extract_field_to_txt('eval_dataset/QA-manufacturing.json', 'eval_pdfs/qa_questions.txt', 'question')
 # extract_field_to_txt('eval_dataset/QA-manufacturing.json', 'eval_pdfs/qa_ref_rubric.txt', 'referenceAnswer')
 # extract_field_to_txt('eval_dataset/QA-manufacturing.json', 'eval_pdfs/qa_context.txt', 'context')
