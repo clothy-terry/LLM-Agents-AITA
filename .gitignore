@@ -16,3 +16,5 @@ eval_pdfs/qa_questions.txt
 eval_pdfs/qa_ref_rubric.txt
 uploads/*
 !uploads/.gitkeep
+eval_pdfs/l_a_rating.txt
+eval_pdfs/physics_rating.txt
