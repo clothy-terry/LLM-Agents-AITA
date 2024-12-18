@@ -77,6 +77,7 @@ You can fix it by adding the missing package manually to your `devDependencies`.
 
 ```bash
 npm install --save-dev @babel/plugin-proposal-private-property-in-object
+```
 
 ---
 
