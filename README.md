@@ -67,6 +67,19 @@ python backend.py
 
 ---
 
+### Fixing Warning/Error
+
+If you encounter the warning or error mentioned above:
+
+> One of your dependencies, `babel-preset-react-app`, is importing the `@babel/plugin-proposal-private-property-in-object` package without declaring it in its dependencies. This is currently working because `@babel/plugin-proposal-private-property-in-object` is already in your `node_modules` folder for unrelated reasons, but it may break at any time.
+
+You can fix it by adding the missing package manually to your `devDependencies`. Run the following command:
+
+```bash
+npm install --save-dev @babel/plugin-proposal-private-property-in-object
+
+---
+
 ## Project Structure
 
 ### `frontend`
